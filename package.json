@@ -1,0 +1,14 @@
+{
+  "name": "formulario-licencias",
+  "version": "1.0.0",
+  "description": "Formulario con carga de foto, u2net y WhatsApp",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
