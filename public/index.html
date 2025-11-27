@@ -266,36 +266,52 @@ function hideLoader() {
 // CAPTURAR FOTO
 // ============================
 async function capturar() {
+    console.log("capturar() ejecutado");
+
     const video = document.getElementById("video");
     const preview = document.getElementById("preview");
 
-    preview.style.display = "none";
-    video.style.display = "block";
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        preview.style.display = "none";
+        video.style.display = "block";
 
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    video.srcObject = stream;
+        console.log("Cámara abierta");
 
-    toast("Acomódate en la cámara y toca para tomar la foto.");
+        // Asegurar que el video tenga dimensiones reales
+        await new Promise(r => setTimeout(r, 500));
+        console.log("videoWidth =", video.videoWidth, "videoHeight =", video.videoHeight);
 
-    video.onclick = async () => {
-        showLoader();
+        toast("Acomódate y toca el video para tomar foto");
 
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
+        video.onclick = async () => {
+            console.log("CLICK detectado en el video");
 
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+            showLoader();
 
-        ctx.drawImage(video, 0, 0);
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
 
-        video.srcObject.getTracks().forEach(t => t.stop());
-        video.style.display = "none";
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
 
-        await procesarImagen(canvas);
+            console.log("Canvas creado:", canvas.width, canvas.height);
 
-        hideLoader();
-        toast("Foto procesada");
-    };
+            ctx.drawImage(video, 0, 0);
+
+            stream.getTracks().forEach(t => t.stop());
+            video.style.display = "none";
+
+            await procesarImagen(canvas);
+
+            hideLoader();
+            toast("Foto procesada correctamente");
+        };
+    } catch (err) {
+        console.error("ERROR EN capturar():", err);
+        toast("No se pudo abrir la cámara.");
+    }
 }
 
 // ============================
