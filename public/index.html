@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Solicitud Licencia</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solicitud Licencia de Conducir</title>
 
+<!-- ====== ESTILOS ====== -->
 <style>
     body {
         background: #f2f2f2;
-        font-family: "Inter", Arial, sans-serif;
+        font-family: "Inter", sans-serif;
         margin: 0;
         padding: 0;
         display: flex;
@@ -18,221 +19,153 @@
     .form-wrapper {
         width: 100%;
         max-width: 600px;
-        margin: 40px auto;
-        background: #ffffff;
-        padding: 45px;
+        background: white;
+        padding: 40px;
+        margin: 30px;
         border-radius: 10px;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-        position: relative;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
     }
 
     h1 {
-        font-size: 22px;
-        margin-bottom: 25px;
+        font-size: 20px;
         font-weight: 700;
+        margin-bottom: 25px;
         text-transform: uppercase;
-        color: #222;
     }
 
     label {
+        margin-top: 15px;
+        display: block;
         font-size: 14px;
         font-weight: 600;
-        margin-bottom: 5px;
-        color: #333;
-        display: block;
-        text-transform: uppercase;
     }
 
     .input {
         width: 100%;
         padding: 14px;
-        border-radius: 6px;
+        border-radius: 8px;
         border: 1px solid #ddd;
+        margin-top: 6px;
+        margin-bottom: 18px;
         font-size: 15px;
-        margin-bottom: 20px;
-        outline: none;
-        transition: 0.2s;
-    }
-
-    .input:focus {
-        border-color: #00a884;
-        box-shadow: 0 0 0 2px rgba(0,168,132,0.15);
     }
 
     .btn {
-        width: 100%;
         padding: 15px;
         background: #25d366;
-        color: #fff;
-        font-size: 17px;
+        width: 100%;
         border: none;
-        border-radius: 7px;
+        border-radius: 8px;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
         cursor: pointer;
         margin-top: 10px;
-        font-weight: 700;
-        transition: 0.25s;
-        box-shadow: 0px 4px 10px rgba(37,211,102,0.3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: 0.2s;
     }
 
     .btn:hover {
         background: #1ebe5d;
-        box-shadow: 0px 4px 14px rgba(37,211,102,0.45);
     }
 
-    #video {
-        width: 100%;
-        border-radius: 8px;
-    }
-
-    #silueta {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        opacity: 0.35;
-        pointer-events: none;
-        display: none;
-    }
-
-    #preview-area {
-        margin-top: 20px;
-        display: none;
-    }
-
-    #captured-img {
-        width: 100%;
-        display: none;
-        margin-top: 15px;
-        border-radius: 8px;
+    /* Botón de foto */
+    .btn-photo {
+        background: #4CAF50;
+        margin-bottom: 20px;
     }
 
     /* Loader */
     #loader {
         display: none;
         position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(255,255,255,0.85);
-        backdrop-filter: blur(3px);
-        z-index: 9999;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        padding: 25px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     }
 
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 6px solid #e0e0e0;
-        border-top-color: #25d366;
-        border-radius: 50%;
-        animation: spin 0.9s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    #loader-text {
-        margin-top: 15px;
-        font-size: 17px;
-        font-weight: 600;
-        color: #222;
-    }
-
-    /* Mensajes flotantes */
+    /* Mensajes tipo WhatsForm */
     #toast {
         position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 14px 18px;
-        background: #25d366;
-        color: #fff;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #202020;
+        color: white;
+        padding: 14px 20px;
+        border-radius: 25px;
+        font-size: 15px;
         display: none;
-        z-index: 99999;
-        font-size: 14px;
-        animation: slideIn 0.3s ease-out;
+        animation: fadein 0.3s;
     }
 
-    @keyframes slideIn {
-        from { transform: translateX(120%); }
-        to { transform: translateX(0); }
+    @keyframes fadein {
+        from { opacity: 0; transform: translate(-50%, 20px); }
+        to   { opacity: 1; transform: translate(-50%, 0); }
     }
 
-    .toast-error {
-        background: #ff4444 !important;
+    img {
+        width: 100%;
+        margin-top: 10px;
+        border-radius: 10px;
     }
-
 </style>
 </head>
 
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-    <div class="spinner"></div>
-    <div id="loader-text">Procesando imagen…</div>
-</div>
-
-<!-- TOAST -->
-<div id="toast"></div>
-
 <div class="form-wrapper">
 
     <h1>SOLICITUD LICENCIA DE CONDUCIR</h1>
 
+    <!-- FOTO -->
     <label>* FOTO DEL SOLICITANTE</label>
-    <button type="button" class="btn" onclick="abrirCamara()">Capturar foto</button>
+    <button class="btn btn-photo" onclick="capturar()">Capturar foto</button>
+    <video id="video" autoplay playsinline style="width:100%; display:none;"></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="preview" style="display:none;">
 
-    <div id="preview-area">
-        <div style="position:relative;">
-            <video id="video" autoplay></video>
-            <img id="silueta" src="https://i.imgur.com/e4JTgP7.png">
-        </div>
-
-        <button class="btn" style="margin-top:12px;" onclick="capturar()">Tomar fotografía</button>
-    </div>
-
-    <img id="captured-img">
-
-    <!-- CAMPOS FORMULARIO -->
-    <label>* TELÉFONO</label>
-    <input id="telefono" class="input" maxlength="10">
+    <!-- CAMPOS DEL FORMULARIO -->
+    <label>* NUM TELÉFONO</label>
+    <input class="input" id="telefono">
 
     <label>* TIPO DE LICENCIA</label>
-    <select id="tipo_licencia" class="input">
+    <select class="input" id="tipo_licencia">
         <option value="">Seleccionar…</option>
         <option>CHOFER - C</option>
         <option>AUTOMOVILISTA - A</option>
         <option>MOTOCICLISTA - M</option>
     </select>
 
-    <label>* VÁLIDA POR</label>
-    <select id="valida_por" class="input">
+    <label>* VALIDA POR</label>
+    <select class="input" id="valida_por">
         <option value="">Seleccionar…</option>
         <option>3 AÑOS $650</option>
         <option>5 AÑOS $700</option>
     </select>
 
     <label>* NOMBRE COMPLETO</label>
-    <input id="nombre" class="input">
+    <input class="input" id="nombre">
 
     <label>* CURP</label>
-    <input id="curp" class="input" maxlength="18">
+    <input class="input" id="curp">
 
-    <label>* ¿ACEPTA DOMICILIO DE GUERRERO?</label>
-    <select id="domicilio" class="input">
+    <label>* DOMICILIO DE GUERRERO (OBLIGATORIO)</label>
+    <select class="input" id="domicilio">
         <option value="">Seleccionar…</option>
         <option>SI</option>
     </select>
 
     <label>* ALERGIAS O RESTRICCIONES</label>
-    <input id="alergias" class="input">
+    <input class="input" id="alergias">
 
     <label>* TIPO DE SANGRE</label>
-    <select id="sangre" class="input">
+    <select class="input" id="sangre">
         <option value="">Seleccionar…</option>
         <option>AB+</option><option>AB-</option>
         <option>A+</option><option>A-</option>
@@ -241,218 +174,187 @@
         <option>DESCONOCE</option>
     </select>
 
-    <label>* CONTACTO DE EMERGENCIA</label>
-    <input id="emergencia_nombre" class="input">
+    <label>* CONTACTO EMERGENCIA NOMBRE</label>
+    <input class="input" id="emergencia_nombre">
 
-    <label>* TEL. EMERGENCIA</label>
-    <input id="emergencia_tel" class="input" maxlength="10">
+    <label>* TELÉFONO EMERGENCIA</label>
+    <input class="input" id="emergencia_tel">
 
-    <h3 style="margin-top:25px;">DATOS DE ENVÍO</h3>
+    <h3>DATOS PARA ENVÍO</h3>
 
     <label>* NOMBRE DESTINATARIO</label>
-    <input id="dest_nombre" class="input">
+    <input class="input" id="dest_nombre">
 
-    <label>* TEL. DESTINATARIO</label>
-    <input id="dest_tel" class="input" maxlength="10">
+    <label>* TELÉFONO DESTINATARIO</label>
+    <input class="input" id="dest_tel">
 
     <label>* CALLE</label>
-    <input id="calle" class="input">
+    <input class="input" id="calle">
 
-    <label>* NÚMERO EXT</label>
-    <input id="numero_ext" class="input">
+    <label>* NUM EXT</label>
+    <input class="input" id="numero_ext">
 
     <label>* COLONIA</label>
-    <input id="colonia" class="input">
+    <input class="input" id="colonia">
 
-    <label>* CP</label>
-    <input id="cp" class="input" maxlength="5">
+    <label>* CÓDIGO POSTAL</label>
+    <input class="input" id="cp">
 
     <label>* CIUDAD</label>
-    <input id="ciudad" class="input">
+    <input class="input" id="ciudad">
 
     <label>* ESTADO</label>
-    <input id="estado" class="input">
+    <input class="input" id="estado">
 
-    <button class="btn" onclick="enviarWhatsApp()">Enviar en WhatsApp</button>
+    <button class="btn" onclick="enviarWhatsApp()">Enviar</button>
+
 </div>
 
-<!-- ONNX -->
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+    <p>Procesando imagen...</p>
+</div>
+
+<div id="toast"></div>
+
+<!-- ONNX RUNTIME -->
 <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
 
 <script>
-let session = null;
-let fotoProcesada = "";
-let fotoURL = "";
+// ============================
+// CONFIGURACIÓN
+// ============================
+const serverURL = "https://formulario-licencias-production.up.railway.app/api/upload";  // <--- CAMBIAR
 
-// Toast
-function toast(msg, error = false) {
+let session = null;
+let previewImg = null;
+
+// ============================
+// CARGAR MODELO U²NETP
+// ============================
+async function loadModel() {
+    session = await ort.InferenceSession.create("./models/u2netp.onnx", {
+        executionProviders: ["wasm"]
+    });
+    console.log("Modelo cargado.");
+}
+loadModel();
+
+// ============================
+// MOSTRAR TOAST
+// ============================
+function toast(msg) {
     const t = document.getElementById("toast");
     t.innerText = msg;
-    t.classList.toggle("toast-error", error);
     t.style.display = "block";
-    setTimeout(() => { t.style.display = "none"; }, 3500);
+    setTimeout(() => t.style.display = "none", 3000);
 }
 
-// Loader
+// ============================
+// MOSTRAR LOADER
+// ============================
 function showLoader() {
-    document.getElementById("loader").style.display = "flex";
+    document.getElementById("loader").style.display = "block";
 }
+
 function hideLoader() {
     document.getElementById("loader").style.display = "none";
 }
 
-// ======================================
-// CARGAR MODELO LOCAL
-// ======================================
-async function cargarModelo() {
-    try {
-        session = await ort.InferenceSession.create("/models/u2netp.onnx");
-    } catch (err) {
-        toast("Error cargando modelo", true);
-    }
-}
-cargarModelo();
-
-// ======================================
-// CÁMARA
-// ======================================
-async function abrirCamara() {
-    document.getElementById("preview-area").style.display = "block";
-    document.getElementById("silueta").style.display = "block";
-
+// ============================
+// CAPTURAR FOTO
+// ============================
+async function capturar() {
     const video = document.getElementById("video");
+    const preview = document.getElementById("preview");
+
+    preview.style.display = "none";
+    video.style.display = "block";
+
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
+
+    toast("Acomódate en la cámara y toca para tomar la foto.");
+
+    video.onclick = async () => {
+        showLoader();
+
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        ctx.drawImage(video, 0, 0);
+
+        video.srcObject.getTracks().forEach(t => t.stop());
+        video.style.display = "none";
+
+        await procesarImagen(canvas);
+
+        hideLoader();
+        toast("Foto procesada");
+    };
 }
 
-// ======================================
-// CAPTURAR FOTO + PROCESAR
-// ======================================
-async function capturar() {
-    if (!session) return toast("Modelo no cargado aún", true);
+// ============================
+// PREPROCESAR → 320x320
+// ============================
+async function preprocessImage(img) {
+    const size = 320;
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    c.width = size;
+    c.height = size;
 
-    showLoader();
+    ctx.drawImage(img, 0, 0, size, size);
 
-    const video = document.getElementById("video");
-    const w = video.videoWidth;
-    const h = video.videoHeight;
+    const { data } = ctx.getImageData(0, 0, size, size);
+    const input = new Float32Array(size * size * 3);
 
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, w, h);
-
-    const imageData = ctx.getImageData(0,0,w,h);
-
-    const inputTensor = prepararU2(imageData);
-
-    const result = await session.run({ "input.1": inputTensor });
-    const mask = result.output.data;
-
-    const outputCanvas = document.createElement("canvas");
-    outputCanvas.width = w; outputCanvas.height = h;
-    const ctxOut = outputCanvas.getContext("2d");
-
-    // Fondo blanco
-    ctxOut.fillStyle = "#FFFFFF";
-    ctxOut.fillRect(0,0,w,h);
-
-    const newImg = ctxOut.getImageData(0,0,w,h);
-    const d = newImg.data;
-
-    for (let i = 0; i < mask.length; i++) {
-        d[i*4+3] = mask[i] > 0.3 ? 255 : 0;
-    }
-
-    ctxOut.putImageData(newImg,0,0);
-    ctxOut.globalCompositeOperation = "source-in";
-    ctxOut.drawImage(canvas,0,0);
-
-    fotoProcesada = outputCanvas.toDataURL("image/png");
-
-    document.getElementById("captured-img").src = fotoProcesada;
-    document.getElementById("captured-img").style.display = "block";
-
-    await subirFoto();
-
-    hideLoader();
-    toast("Foto procesada correctamente");
-}
-
-// Preparar tensor
-function prepararU2(img) {
-    const out = new Float32Array(img.width * img.height * 3);
     let j = 0;
-    for (let i = 0; i < img.data.length; i += 4) {
-        out[j++] = img.data[i] / 255;
-        out[j++] = img.data[i+1] / 255;
-        out[j++] = img.data[i+2] / 255;
+    for (let i = 0; i < data.length; i += 4) {
+        input[j++] = data[i] / 255;
+        input[j++] = data[i + 1] / 255;
+        input[j++] = data[i + 2] / 255;
     }
-    return new ort.Tensor("float32", out, [1, 3, img.height, img.width]);
+
+    return new ort.Tensor("float32", input, [1, 3, size, size]);
 }
 
-// ======================================
-// SUBIR FOTO AL SERVIDOR
-// ======================================
-async function subirFoto() {
-    const serverURL = "https://formulario-licencias-production.up.railway.app";  /* <-- CAMBIAR */
+// ============================
+// PROCESAR IMAGEN CON U2NETP
+// ============================
+async function procesarImagen(canvasOriginal) {
+    const tensor = await preprocessImage(canvasOriginal);
 
-    const res = await fetch(serverURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: fotoProcesada })
-    });
+    const feeds = {};
+    feeds["input.1"] = tensor;
 
-    const data = await res.json();
-    fotoURL = data.url;
+    const results = await session.run(feeds);
+
+    const output = results[Object.keys(results)[0]];
+    console.log("Modelo procesó:", output);
+
+    // Mostrar imagen original por ahora
+    const preview = document.getElementById("preview");
+    preview.src = canvasOriginal.toDataURL("image/png");
+    preview.style.display = "block";
 }
 
-// ======================================
+// ============================
 // ENVIAR WHATSAPP
-// ======================================
+// ============================
 function enviarWhatsApp() {
-    const t = id => document.getElementById(id).value.trim();
-
-    const campos = [
-        "telefono","tipo_licencia","valida_por","nombre","curp","domicilio",
-        "alergias","sangre","emergencia_nombre","emergencia_tel",
-        "dest_nombre","dest_tel","calle","numero_ext","colonia","cp","ciudad","estado"
-    ];
-
-    for (const c of campos)
-        if (!t(c)) return toast("Completa todos los campos", true);
-
-    if (!fotoURL) return toast("Debes capturar tu foto", true);
-
-    const folio = Math.floor(10000 + Math.random() * 90000);
-
     const msg = `
-SOLICITUD LICENCIA DE CONDUCIR
-Folio #${folio}
-
-FOTO:
-${fotoURL}
-
-DATOS PERSONALES:
-Teléfono: ${t("telefono")}
-Licencia: ${t("tipo_licencia")}
-Válida por: ${t("valida_por")}
-Nombre: ${t("nombre")}
-CURP: ${t("curp")}
-Alergias: ${t("alergias")}
-Sangre: ${t("sangre")}
-Contacto emergencia: ${t("emergencia_nombre")} ${t("emergencia_tel")}
-
-ENVÍO:
-Destinatario: ${t("dest_nombre")}
-Teléfono: ${t("dest_tel")}
-Dirección: ${t("calle")} ${t("numero_ext")}, ${t("colonia")}
-CP: ${t("cp")}
-Ciudad/Estado: ${t("ciudad")}, ${t("estado")}
-`;
-
+Solicitud Licencia de Conducir
+Nombre: ${nombre.value}
+CURP: ${curp.value}
+…
+    `;
     window.location.href =
-        `https://wa.me/527225600905?text=${encodeURIComponent(msg)}`;
+        "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
 }
 </script>
 
