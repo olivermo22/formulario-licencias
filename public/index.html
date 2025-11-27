@@ -293,52 +293,68 @@ async function preprocessImage(img){
 // ================================
 // APLICAR MÁSCARA
 // ================================
-function applyMaskToImage(originalCanvas, maskTensor){
-    const maskData = maskTensor.data;
+function applyMaskToImage(originalCanvas, maskTensor) {
+    const maskData = maskTensor.data; // Float32Array (1,1,320,320)
     const w = originalCanvas.width;
     const h = originalCanvas.height;
 
+    // Canvas resultado
     const result = document.createElement("canvas");
     result.width = w;
     result.height = h;
     const rctx = result.getContext("2d");
 
+    // Dibujamos la imagen original
     rctx.drawImage(originalCanvas, 0, 0);
     const imgData = rctx.getImageData(0, 0, w, h);
     const d = imgData.data;
 
-    // Crear máscara 320x320
+    // 1) Construimos la máscara 320x320 en escala de grises
     const maskCanvas = document.createElement("canvas");
     maskCanvas.width = 320;
     maskCanvas.height = 320;
     const mctx = maskCanvas.getContext("2d");
+    const maskImg = mctx.createImageData(320, 320);
 
-    const maskImg = mctx.createImageData(320,320);
-
-    for(let i=0; i<maskData.length; i++){
-        let v = maskData[i]*255;
-        maskImg.data[i*4] = v;
-        maskImg.data[i*4+1] = v;
-        maskImg.data[i*4+2] = v;
-        maskImg.data[i*4+3] = 255;
+    for (let i = 0; i < maskData.length; i++) {
+        // El modelo suele devolver valores [0,1] o cercanos
+        let v = Math.max(0, Math.min(1, maskData[i])) * 255;
+        maskImg.data[i * 4]     = v;
+        maskImg.data[i * 4 + 1] = v;
+        maskImg.data[i * 4 + 2] = v;
+        maskImg.data[i * 4 + 3] = 255;
     }
-    mctx.putImageData(maskImg,0,0);
+    mctx.putImageData(maskImg, 0, 0);
 
-    // Escalar máscara
+    // 2) Escalamos la máscara al tamaño original de la foto
     const scaled = document.createElement("canvas");
     scaled.width = w;
     scaled.height = h;
-    scaled.getContext("2d").drawImage(maskCanvas,0,0,320,320,0,0,w,h);
-    const finalMask = scaled.getContext("2d").getImageData(0,0,w,h).data;
+    const sctx = scaled.getContext("2d");
+    sctx.drawImage(maskCanvas, 0, 0, 320, 320, 0, 0, w, h);
+    const finalMask = sctx.getImageData(0, 0, w, h).data;
 
-    for(let i=0; i<d.length; i+=4){
-        const a = finalMask[i]/255;
-        d[i] *= a;
-        d[i+1] *= a;
-        d[i+2] *= a;
+    // 3) Aplicamos la máscara:
+    //    - Si la máscara < UMBRAL → pixel = blanco
+    //    - Si la máscara ≥ UMBRAL → se deja el pixel original
+    const THRESHOLD = 0.5; // puedes probar 0.4 o 0.6
+
+    for (let i = 0; i < d.length; i += 4) {
+        const m = finalMask[i] / 255;  // 0 a 1
+
+        if (m < THRESHOLD) {
+            // Fondo: blanco
+            d[i]     = 255; // R
+            d[i + 1] = 255; // G
+            d[i + 2] = 255; // B
+            d[i + 3] = 255; // A
+        } else {
+            // Persona: dejamos la info original (ya está en d)
+            d[i + 3] = 255;
+        }
     }
 
-    rctx.putImageData(imgData,0,0);
+    rctx.putImageData(imgData, 0, 0);
     return result;
 }
 
