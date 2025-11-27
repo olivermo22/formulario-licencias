@@ -346,7 +346,7 @@ async function capturar() {
 
     const inputTensor = prepararU2(imageData);
 
-    const result = await session.run({ input: inputTensor });
+    const result = await session.run({ "input.1": inputTensor });
     const mask = result.output.data;
 
     const outputCanvas = document.createElement("canvas");
