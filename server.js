@@ -29,13 +29,44 @@ const upload = multer({ storage });
 app.post("/upload", upload.single("foto"), (req, res) => {
   const fileUrl = `/uploads/${req.file.filename}`;
 
-  // URL ABSOLUTA (Requerida por WhatsApp)
   const absoluteUrl = `${process.env.RAILWAY_PUBLIC_DOMAIN || ""}${fileUrl}`;
 
   res.json({
     success: true,
     url: absoluteUrl
   });
+});
+
+// ===============================
+// NUEVO: LISTAR ARCHIVOS SUBIDOS
+// ===============================
+app.get("/list-uploads", (req, res) => {
+    fs.readdir(uploadDir, (err, files) => {
+        if (err) return res.json({ files: [] });
+
+        const details = files.map(name => {
+            const stats = fs.statSync(path.join(uploadDir, name));
+            return { name, size: stats.size };
+        });
+
+        res.json({ files: details });
+    });
+});
+
+// ===============================
+// NUEVO: ELIMINAR ARCHIVO
+// ===============================
+app.post("/delete-upload", express.json(), (req, res) => {
+    const { name } = req.body;
+
+    if (!name) return res.json({ success: false });
+
+    const filePath = path.join(uploadDir, name);
+
+    fs.unlink(filePath, err => {
+        if (err) return res.json({ success: false });
+        res.json({ success: true });
+    });
 });
 
 const port = process.env.PORT || 3000;

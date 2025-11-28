@@ -99,3 +99,44 @@ label {
     bottom: 90px;
     background: #ff4444;
 }
+
+/* ===================== */
+/* PANEL SECRETO ADMIN */
+/* ===================== */
+
+.admin-panel {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 6px;
+}
+
+.file-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #fafafa;
+    border-radius: 6px;
+}
+
+.thumb {
+    width: 80px;
+    height: auto;
+    border-radius: 6px;
+    margin-right: 15px;
+}
+
+.info {
+    flex: 1;
+}
+
+.delete-btn {
+    background: #ff4444;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
