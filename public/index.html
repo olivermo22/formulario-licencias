@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solicitud Licencia</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -59,26 +57,20 @@
 </div>
 
 
-
-<!-- ======================================================== -->
-<!--                     MODAL CÁMARA                         -->
-<!-- ======================================================== -->
-
+<!-- ==========================
+        MODAL CÁMARA
+=========================== -->
 <div id="modalCam" class="modal">
 
     <!-- Pantalla de captura -->
     <div id="screenCapture" class="camera-screen">
 
-        <!-- Botón cerrar -->
         <span class="close-btn" onclick="cerrarModalCam()">×</span>
 
-        <!-- Cámara -->
         <video id="video" autoplay playsinline></video>
 
-        <!-- Silueta -->
         <img src="silueta.png" class="silueta-overlay">
 
-        <!-- Botón circular tipo cámara -->
         <div class="shutter-btn" onclick="capturarFoto()"></div>
     </div>
 
@@ -97,26 +89,15 @@
 </div>
 
 
-
-<!-- ======================================================== -->
-<!--                        LOADER                            -->
-<!-- ======================================================== -->
+<!-- LOADER -->
 <div id="loader" class="loader">
     <div class="spinner"></div>
     <p>Procesando...</p>
 </div>
 
-
-<!-- ======================================================== -->
-<!--                     TOAST MESSAGE                        -->
-<!-- ======================================================== -->
+<!-- TOAST -->
 <div id="toast" class="toast"></div>
 
-
-
-<!-- ======================================================== -->
-<!--                        JAVASCRIPT                        -->
-<!-- ======================================================== -->
 
 <script>
 
@@ -124,44 +105,49 @@ let stream;
 let imagenBase64 = "";
 let linkFotoServidor = "";
 
-/* ========== ABRIR MODAL ========== */
+/* =======================
+       ABRIR / CERRAR MODAL
+========================= */
+
 function abrirModal() {
     document.getElementById("modalCam").style.display = "flex";
     document.getElementById("screenCapture").style.display = "flex";
     document.getElementById("screenPreview").style.display = "none";
-
     iniciarCamara();
 }
 
-/* ========== CERRAR MODAL ========== */
 function cerrarModalCam() {
     document.getElementById("modalCam").style.display = "none";
     detenerCamara();
 }
 
-/* ========== INICIAR CÁMARA ========== */
+
+/* =======================
+        CÁMARA
+========================= */
+
 function iniciarCamara() {
     navigator.mediaDevices.getUserMedia({ video: true })
     .then(s => {
         stream = s;
         document.getElementById("video").srcObject = s;
     })
-    .catch(err => {
-        toast("No se pudo acceder a la cámara");
-        console.error(err);
-    });
+    .catch(e => toast("No se pudo acceder a la cámara"));
 }
 
-/* ========== DETENER CÁMARA ========== */
 function detenerCamara() {
     if (stream) stream.getTracks().forEach(t => t.stop());
 }
 
-/* ========== CAPTURAR FOTO ========== */
+
+/* =======================
+        CAPTURAR
+========================= */
+
 function capturarFoto() {
     const video = document.getElementById("video");
-
     const canvas = document.createElement("canvas");
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
@@ -176,40 +162,45 @@ function capturarFoto() {
     document.getElementById("screenPreview").style.display = "block";
 }
 
-/* ========== REPETIR FOTO ========== */
 function repetirFoto() {
     document.getElementById("screenCapture").style.display = "flex";
     document.getElementById("screenPreview").style.display = "none";
 }
 
-/* ========== CONFIRMAR FOTO ========== */
+
+/* =======================
+        CONFIRMAR
+========================= */
+
 async function confirmarFoto() {
 
     cerrarModalCam();
 
-    // Mostrar preview en el formulario
     document.getElementById("previewFinal").src = imagenBase64;
     document.getElementById("previewFinal").style.display = "block";
 
-    // Subir foto al servidor
     showLoader();
+
     const res = await fetch("/api/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ foto: imagenBase64 })
     });
+
     hideLoader();
 
     const data = await res.json();
-    linkFotoServidor = data.url;   // <--- Guardamos link público
+    linkFotoServidor = data.url;
 
     toast("Foto guardada correctamente");
 }
 
-/* ========== ENVIAR WHATSAPP ========== */
-function enviarWhatsApp(){
 
- function enviarWhatsApp(){
+/* =======================
+       ENVIAR WHATSAPP
+========================= */
+
+function enviarWhatsApp() {
 
     if (!linkFotoServidor) {
         toast("Primero toma la foto");
@@ -232,16 +223,23 @@ ${direccion.value}
 `;
 
     window.location.href =
-      "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
+        "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
 }
 
-/* ========== TOAST ========== */
+
+/* =======================
+       TOAST & LOADER
+========================= */
+
 function toast(msg){
     const t = document.getElementById("toast");
     t.innerText = msg;
     t.style.display = "block";
     setTimeout(()=> t.style.display="none",2500);
 }
+
+function showLoader(){ document.getElementById("loader").style.display = "flex"; }
+function hideLoader(){ document.getElementById("loader").style.display = "none"; }
 
 </script>
 
