@@ -18,13 +18,17 @@
 
     <!-- Vista cámara -->
     <div id="camContainer" class="cam-wrapper" style="display:none;">
+
+    <div class="cam-inner">
         <video id="video" autoplay playsinline></video>
 
-        <!-- Silueta -->
-        <img src="silueta.png" class="silueta" />
-
-        <p class="cam-msg">Alinea tu rostro con la silueta y toca para tomar la foto</p>
+        <!-- SILUETA PERFECTAMENTE CENTRADA -->
+        <img src="silueta.png" class="silueta-overlay" />
     </div>
+
+    <p class="cam-msg">Alinea tu rostro con la silueta y toca para tomar la foto</p>
+</div>
+
 
     <!-- Imagen final -->
     <img id="preview" class="preview-img" style="display:none;" />
