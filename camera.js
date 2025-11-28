@@ -7,15 +7,16 @@ function openCamera() {
         .then(s => {
             stream = s;
             document.getElementById("camera").srcObject = s;
-        });
+        })
+        .catch(() => alert("No se pudo acceder a la cámara."));
 }
 
 function closeCamera() {
     document.getElementById("camera-modal").style.display = "none";
-    stream.getTracks().forEach(t => t.stop());
+    if (stream) stream.getTracks().forEach(t => t.stop());
 }
 
-function capture() {
+async function capture() {
     const video = document.getElementById("camera");
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
@@ -25,16 +26,20 @@ function capture() {
     ctx.drawImage(video, 0, 0);
 
     canvas.toBlob(async (blob) => {
-
         const formData = new FormData();
         formData.append("foto", blob, "foto.png");
 
-        const response = await fetch("/upload", {
+        const req = await fetch("/upload", {
             method: "POST",
             body: formData
         });
 
-        const data = await response.json();
+        const data = await req.json();
+
+        if (!data.success) {
+            alert("Error al subir la foto");
+            return;
+        }
 
         document.getElementById("foto_url").value = data.url;
 
