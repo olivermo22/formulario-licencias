@@ -15,6 +15,7 @@ function openCamera() {
     resetCameraUI();
 
     document.getElementById("overlay").src = "silhouette.png";
+    document.getElementById("overlay").style.display = "block";
 
     document.getElementById("camera-modal").style.display = "block";
 
@@ -30,7 +31,8 @@ function openCameraDoc() {
     captureMode = "documento";
     resetCameraUI();
 
-    document.getElementById("overlay").src = "silueta-documento.png";
+    // Aquí quitamos la silueta
+    document.getElementById("overlay").style.display = "none";
 
     document.getElementById("camera-modal").style.display = "block";
 
