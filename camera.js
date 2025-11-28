@@ -2,10 +2,19 @@ let stream;
 let capturedBlob = null;
 let captureMode = "rostro"; // "rostro" o "documento"
 
+function resetCameraUI() {
+    document.getElementById("preview-area").style.display = "none";
+    document.getElementById("camera").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("btn-capture").style.display = "block";
+    document.getElementById("btn-close").style.display = "block";
+}
 
 function openCamera() {
+    captureMode = "rostro";
+    resetCameraUI();
+
     document.getElementById("camera-modal").style.display = "block";
-    document.getElementById("preview-area").style.display = "none";
 
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(s => {
@@ -17,29 +26,31 @@ function openCamera() {
 
 function openCameraDoc() {
     captureMode = "documento";
+    resetCameraUI();
 
     document.getElementById("camera-modal").style.display = "block";
-    document.getElementById("preview-area").style.display = "none";
 
     navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } } // Cámara trasera
+        video: { facingMode: { ideal: "environment" } }
     })
     .then(s => {
         stream = s;
         document.getElementById("camera").srcObject = s;
     })
     .catch(() => {
-        alert("No se pudo acceder a la cámara trasera. Se usará la cámara normal.");
-        openCamera(); // fallback a cámara frontal
+        alert("No se pudo acceder a la cámara trasera. Se usará la frontal.");
+        openCamera();
     });
 }
 
 function closeCamera() {
-    document.getElementById("camera-modal").style.display = "none";
     if (stream) {
         stream.getTracks().forEach(t => t.stop());
         stream = null;
     }
+
+    resetCameraUI();
+    document.getElementById("camera-modal").style.display = "none";
 }
 
 function capture() {
@@ -68,13 +79,10 @@ function capture() {
 }
 
 function retakePhoto() {
+    resetCameraUI();
     document.getElementById("preview-area").style.display = "none";
-
-    document.getElementById("camera").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
-    document.getElementById("btn-capture").style.display = "block";
-    document.getElementById("btn-close").style.display = "block";
 }
+
 
 function cancelPhoto() {
     capturedBlob = null;
