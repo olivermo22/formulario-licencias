@@ -1,36 +1,14 @@
 let stream;
 let capturedBlob = null;
-let mode = "persona";
 
-/* ---------------------------
-   ABRIR CÁMARA PARA PERSONA
----------------------------- */
-function openCameraPersona() {
-    mode = "persona";
-    openCamera();
-}
-
-/* ---------------------------
-   ABRIR CÁMARA PARA INE
----------------------------- */
-function openCameraID() {
-    mode = "identificacion";
-    openCamera();
-}
-
-/* ---------------------------
+/* -----------------------------------
    ABRIR CÁMARA
----------------------------- */
+----------------------------------- */
 function openCamera() {
     document.getElementById("camera-modal").style.display = "block";
     document.getElementById("preview-area").style.display = "none";
 
-    // silueta solo si es persona
-    if (mode === "persona") {
-        document.getElementById("overlay").style.display = "block";
-    } else {
-        document.getElementById("overlay").style.display = "none";
-    }
+    document.getElementById("overlay").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(s => {
@@ -40,20 +18,21 @@ function openCamera() {
         .catch(() => alert("No se pudo acceder a la cámara."));
 }
 
-/* ---------------------------
-   CERRAR SENSOR
----------------------------- */
+/* -----------------------------------
+   CERRAR CÁMARA
+----------------------------------- */
 function closeCamera() {
     document.getElementById("camera-modal").style.display = "none";
+
     if (stream) {
         stream.getTracks().forEach(t => t.stop());
         stream = null;
     }
 }
 
-/* ---------------------------
-   CAPTURAR
----------------------------- */
+/* -----------------------------------
+   CAPTURAR FOTO
+----------------------------------- */
 function capture() {
     const video = document.getElementById("camera");
     const canvas = document.createElement("canvas");
@@ -69,7 +48,6 @@ function capture() {
 
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
 
-        // oculta cámara, muestra preview
         document.getElementById("camera").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("btn-capture").style.display = "none";
@@ -79,31 +57,29 @@ function capture() {
     }, "image/png");
 }
 
-/* ---------------------------
+/* -----------------------------------
    RETOMAR
----------------------------- */
+----------------------------------- */
 function retakePhoto() {
     document.getElementById("preview-area").style.display = "none";
 
     document.getElementById("camera").style.display = "block";
-    if (mode === "persona") {
-        document.getElementById("overlay").style.display = "block";
-    }
+    document.getElementById("overlay").style.display = "block";
     document.getElementById("btn-capture").style.display = "block";
     document.getElementById("btn-close").style.display = "block";
 }
 
-/* ---------------------------
-   CANCELAR TODO
----------------------------- */
+/* -----------------------------------
+   CANCELAR
+----------------------------------- */
 function cancelPhoto() {
     capturedBlob = null;
     closeCamera();
 }
 
-/* ---------------------------
-   GUARDAR FOTO
----------------------------- */
+/* -----------------------------------
+   ACEPTAR FOTO (SUBIR)
+----------------------------------- */
 async function acceptPhoto() {
     if (!capturedBlob) {
         alert("No hay foto capturada.");
@@ -119,45 +95,25 @@ async function acceptPhoto() {
     });
 
     const data = await response.json();
+
     if (!data.success) {
         alert("Error al subir la foto.");
         return;
     }
 
-    if (mode === "persona") {
-        document.getElementById("foto_url").value = data.url;
-        document.getElementById("photo-preview").style.display = "block";
-        document.getElementById("photo-check").style.display = "block";
+    document.getElementById("foto_url").value = data.url;
 
-        document.getElementById("final-photo").onerror = () => {
-            document.getElementById("final-photo").style.display = "none";
-        };
+    document.getElementById("photo-preview").style.display = "block";
 
-        document.getElementById("final-photo").onload = () => {
-            document.getElementById("final-photo").style.display = "block";
-        };
+    document.getElementById("final-photo").onerror = () => {
+        document.getElementById("final-photo").style.display = "none";
+    };
 
-        document.getElementById("final-photo").src = data.url;
-    }
+    document.getElementById("final-photo").onload = () => {
+        document.getElementById("final-photo").style.display = "block";
+    };
 
-    if (mode === "identificacion") {
-        document.getElementById("foto_url_identificacion").value = data.url;
-        document.getElementById("photo-preview-id").style.display = "block";
-        document.getElementById("photo-check-id").style.display = "block";
-
-        document.getElementById("final-photo-id").onerror = () => {
-            document.getElementById("final-photo-id").style.display = "none";
-        };
-
-        document.getElementById("final-photo-id").onload = () => {
-            document.getElementById("final-photo-id").style.display = "block";
-        };
-
-        document.getElementById("final-photo-id").src = data.url;
-    }
+    document.getElementById("final-photo").src = data.url;
 
     closeCamera();
-
-    // regresar a modo persona por defecto
-    mode = "persona";
 }

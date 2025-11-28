@@ -15,22 +15,12 @@
 
     <!-- FOTO TITULAR -->
     <label>* FOTO DEL TITULAR (TOMAR CON CÁMARA)</label>
-    <button class="btn-camera" onclick="openCameraPersona()">Tomar fotografía</button>
+    <button class="btn-camera" onclick="openCamera()">Tomar fotografía</button>
     <input type="hidden" id="foto_url">
 
     <div id="photo-preview" class="photo-preview" style="display:none;">
-        <div id="photo-check" class="photo-check" style="display:none;">✓</div>
+        <p>Foto cargada correctamente</p>
         <img id="final-photo" />
-    </div>
-
-    <!-- FOTO IDENTIFICACIÓN -->
-    <label>* FOTO DE IDENTIFICACIÓN OFICIAL (INE, PASAPORTE, ETC.)</label>
-    <button class="btn-camera" onclick="openCameraID()">Tomar foto de identificación</button>
-    <input type="hidden" id="foto_url_identificacion">
-
-    <div id="photo-preview-id" class="photo-preview" style="display:none;">
-        <div id="photo-check-id" class="photo-check" style="display:none;">✓</div>
-        <img id="final-photo-id" />
     </div>
 
     <div class="section-title admin-trigger">DATOS PERSONALES</div>
@@ -231,12 +221,11 @@ function enviarWhatsApp() {
     const t = id => document.getElementById(id).value.trim();
 
     const campos = [
-        "foto_url","foto_url_identificacion",
-        "telefono","tipo_licencia","valida_por",
+        "foto_url","telefono","tipo_licencia","valida_por",
         "nombre","curp","domicilio","alergias","sangre",
         "emergencia_nombre","emergencia_tel",
-        "dest_nombre","dest_tel","calle","numero_ext",
-        "colonia","cp","ciudad","estado"
+        "dest_nombre","dest_tel","calle","numero_ext","colonia",
+        "cp","ciudad","estado"
     ];
 
     for (let c of campos) {
@@ -249,8 +238,7 @@ function enviarWhatsApp() {
 SOLICITUD LICENCIA DE CONDUCIR
 Folio #${folio}
 
-FOTO DEL TITULAR: ${t("foto_url")}
-FOTO IDENTIFICACIÓN: ${t("foto_url_identificacion")}
+FOTO: ${t("foto_url")}
 
 NUM TELEFONO : ${t("telefono")}
 TIPO DE LICENCIA : ${t("tipo_licencia")}
