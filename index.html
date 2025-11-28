@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Solicitud Licencia de Conducir</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -13,14 +13,24 @@
     
     <h1>SOLICITUD LICENCIA DE CONDUCIR</h1>
 
-    <!-- BOTÓN PARA ABRIR LA CÁMARA -->
+    <!-- FOTO TITULAR -->
     <label>* FOTO DEL TITULAR (TOMAR CON CÁMARA)</label>
-    <button class="btn-camera" onclick="openCamera()">Tomar fotografía</button>
+    <button class="btn-camera" onclick="openCameraPersona()">Tomar fotografía</button>
     <input type="hidden" id="foto_url">
 
     <div id="photo-preview" class="photo-preview" style="display:none;">
-        <p>Foto cargada correctamente</p>
+        <div id="photo-check" class="photo-check" style="display:none;">✓</div>
         <img id="final-photo" />
+    </div>
+
+    <!-- FOTO IDENTIFICACIÓN -->
+    <label>* FOTO DE IDENTIFICACIÓN OFICIAL (INE, PASAPORTE, ETC.)</label>
+    <button class="btn-camera" onclick="openCameraID()">Tomar foto de identificación</button>
+    <input type="hidden" id="foto_url_identificacion">
+
+    <div id="photo-preview-id" class="photo-preview" style="display:none;">
+        <div id="photo-check-id" class="photo-check" style="display:none;">✓</div>
+        <img id="final-photo-id" />
     </div>
 
     <div class="section-title admin-trigger">DATOS PERSONALES</div>
@@ -49,17 +59,18 @@
     <label>* CURP</label>
     <input class="input" id="curp" maxlength="18">
 
-    <label>* CON BASE EN LOS LINEAMIENTOS… ¿ESTÁ DE ACUERDO?</label>
+    <label>* CON BASE EN LOS LINEAMIENTOS DE EXPEDICION DE LICENCIA, ES REQUISITO QUE LLEVE DOMICILIO DE GUERRERO ¿ESTA DE ACUERDO CON ESTO?</label>
     <select class="input" id="domicilio">
         <option value="">Seleccionar…</option>
         <option>SI</option>
     </select>
 
     <small>
-        Como la licencia se tramita en Guerrero, se pide que salga con un domicilio de aquí. En caso de no tener domicilio de Guerrero, la licencia saldrá con el domicilio del ayuntamiento donde se realiza el trámite.
+        Como la licencia se tramita en Guerrero. se pide que salga con un domicilio de aqui.
+        <br>En caso de no tener domicilio de guerrero, la licencia saldría con el domicilio del ayuntamiento en donde se realiza el tramite.
     </small>
 
-    <label>* ALERGIAS / RESTRICCIONES</label>
+    <label>* ALERGIAS O RESTRICCIONES</label>
     <input class="input" id="alergias">
 
     <label>* TIPO DE SANGRE</label>
@@ -72,15 +83,15 @@
         <option>DESCONOCE</option>
     </select>
 
-    <label>* CONTACTO EN CASO DE EMERGENCIA (NOMBRE)</label>
+    <label>* NOMBRE DE CONTACTO EN CASO DE EMERGENCIA</label>
     <input class="input" id="emergencia_nombre">
 
-    <label>* TELÉFONO EMERGENCIA</label>
+    <label>* TELÉFONO DE CONTACTO EN CASO DE EMERGENCIA</label>
     <input class="input" id="emergencia_tel" maxlength="10">
 
-    <div class="section-title admin-trigger">DATOS PARA ENVÍO</div>
+    <div class="section-title admin-trigger">DATOS PARA ENVIO</div>
 
-    <!-- PANEL SECRETO: LISTAR Y ELIMINAR FOTOS -->
+    <!-- PANEL SECRETO -->
     <div id="admin-panel" class="admin-panel" style="display:none;">
         <h2>FOTOS CARGADAS</h2>
         <div id="file-list"></div>
@@ -90,19 +101,19 @@
     <label>* NOMBRE DESTINATARIO</label>
     <input class="input" id="dest_nombre">
 
-    <label>* TELÉFONO DESTINATARIO</label>
+    <label>* TELEFONO DESTINATARIO</label>
     <input class="input" id="dest_tel" maxlength="10">
 
     <label>* CALLE</label>
     <input class="input" id="calle">
 
-    <label>* NUM EXT</label>
+    <label>* NUMERO EXT</label>
     <input class="input" id="numero_ext">
 
     <label>* COLONIA</label>
     <input class="input" id="colonia">
 
-    <label>* CÓDIGO POSTAL</label>
+    <label>* CODIGO POSTAL</label>
     <input class="input" id="cp" maxlength="5">
 
     <label>* CIUDAD</label>
@@ -132,47 +143,41 @@
 
 </div>
 
-<!-- MODAL DE CÁMARA -->
+<!-- MODAL CÁMARA -->
 <div id="camera-modal" class="camera-modal">
-    <div id="preview-area" class="preview-area" style="display:none;">
-    <img id="preview-photo" class="preview-photo">
-    <div class="preview-buttons">
-        <button class="btn-accept" onclick="acceptPhoto()">Usar esta foto</button>
-        <button class="btn-retake" onclick="retakePhoto()">Tomar otra</button>
-        <button class="btn-cancel" onclick="cancelPhoto()">Cancelar</button>
-    </div>
-</div>
-
     <video id="camera" autoplay></video>
-    <img id="overlay" src="public/silhouette.png">
+    <img id="overlay" src="silhouette.png">
+
     <button id="btn-capture" class="btn-capture" onclick="capture()">Capturar</button>
-    <button id="btn-close" class="btn-close" onclick="closeCamera()">Cerrar</button>
+    <button id="btn-close" class="btn-close" onclick="cancelPhoto()">Cancelar</button>
+
+    <!-- PREVIEW -->
+    <div id="preview-area" class="preview-area" style="display:none;">
+        <img id="preview-photo" class="preview-photo">
+        <div class="preview-buttons">
+            <button class="btn-accept" onclick="acceptPhoto()">Usar esta foto</button>
+            <button class="btn-retake" onclick="retakePhoto()">Tomar otra</button>
+            <button class="btn-cancel" onclick="cancelPhoto()">Cancelar</button>
+        </div>
+    </div>
 </div>
 
 <script src="camera.js"></script>
 
-<!-- PANEL SECRETO: LÓGICA -->
 <script>
+// PANEL SECRETO
 let adminClicks = 0;
 
 document.querySelectorAll(".admin-trigger").forEach(el => {
     el.addEventListener("click", () => {
         adminClicks++;
-
-        if (adminClicks >= 2) {
-            adminClicks = 0;
-            loadUploads();
-        }
-
+        if (adminClicks >= 2) loadUploads();
         setTimeout(() => adminClicks = 0, 800);
     });
 });
 
 async function loadUploads() {
-
-    // ⛔ Pregunta contraseña antes de mostrar el panel
     const pass = prompt("Ingrese contraseña para acceder:");
-
     if (pass !== "1793") {
         alert("Contraseña incorrecta.");
         return;
@@ -180,7 +185,6 @@ async function loadUploads() {
 
     const panel = document.getElementById("admin-panel");
     const list = document.getElementById("file-list");
-
     panel.style.display = "block";
     list.innerHTML = "Cargando archivos...";
 
@@ -188,7 +192,6 @@ async function loadUploads() {
     const data = await res.json();
 
     list.innerHTML = "";
-
     if (data.files.length === 0) {
         list.innerHTML = "<p>No hay fotos cargadas.</p>";
         return;
@@ -206,38 +209,34 @@ async function loadUploads() {
             </div>
             <button class="delete-btn" onclick="deleteFile('${file.name}')">Eliminar</button>
         `;
-
         list.appendChild(div);
     });
 }
 
 async function deleteFile(name) {
     if (!confirm("¿Eliminar esta foto?")) return;
-
     const req = await fetch("/delete-upload", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({ name })
     });
-
     const res = await req.json();
-
     if (res.success) loadUploads();
-    else alert("Error al eliminar archivo.");
 }
 </script>
 
-<!-- FIN PANEL SECRETO -->
-
 <script>
+// ENVÍO WHATSAPP
 function enviarWhatsApp() {
     const t = id => document.getElementById(id).value.trim();
 
     const campos = [
-        "foto_url","telefono","tipo_licencia","valida_por",
+        "foto_url","foto_url_identificacion",
+        "telefono","tipo_licencia","valida_por",
         "nombre","curp","domicilio","alergias","sangre",
         "emergencia_nombre","emergencia_tel",
-        "dest_nombre","dest_tel","calle","numero_ext","colonia","cp","ciudad","estado"
+        "dest_nombre","dest_tel","calle","numero_ext",
+        "colonia","cp","ciudad","estado"
     ];
 
     for (let c of campos) {
@@ -250,29 +249,27 @@ function enviarWhatsApp() {
 SOLICITUD LICENCIA DE CONDUCIR
 Folio #${folio}
 
-FOTO: ${t("foto_url")}
+FOTO DEL TITULAR: ${t("foto_url")}
+FOTO IDENTIFICACIÓN: ${t("foto_url_identificacion")}
 
-TELÉFONO: ${t("telefono")}
-TIPO DE LICENCIA: ${t("tipo_licencia")}
-VALIDA POR: ${t("valida_por")}
-NOMBRE: ${t("nombre")}
-CURP: ${t("curp")}
-DOMICILIO DE GUERRERO ACEPTADO : SI
-ALERGIAS: ${t("alergias")}
-TIPO DE SANGRE: ${t("sangre")}
-CONTACTO EMERGENCIA: ${t("emergencia_nombre")} (${t("emergencia_tel")})
+NUM TELEFONO : ${t("telefono")}
+TIPO DE LICENCIA : ${t("tipo_licencia")}
+VALIDA POR : ${t("valida_por")}
+NOMBRE COMPLETO : ${t("nombre")}
+CURP : ${t("curp")}
+CON BASE EN LOS LINEAMIENTOS… : SI
+ALERGIAS : ${t("alergias")}
+TIPO DE SANGRE : ${t("sangre")}
+CONTACTO EMERGENCIA : ${t("emergencia_nombre")} ${t("emergencia_tel")}
 
-DATOS DE ENVÍO
-NOMBRE DESTINATARIO : ${t("dest_nombre")}`
-    + `
+DATOS PARA ENVÍO
+NOMBRE DESTINATARIO : ${t("dest_nombre")}
 TELÉFONO DESTINATARIO : ${t("dest_tel")}
 CALLE : ${t("calle")}
-NÚMERO : ${t("numero_ext")}
+NUMERO : ${t("numero_ext")}
 COLONIA : ${t("colonia")}
-CP : ${t("cp")}
+CODIGO POSTAL : ${t("cp")}
 CIUDAD Y ESTADO : ${t("ciudad")}, ${t("estado")}
-
-Tu solicitud será asignada al número 7225600905 para continuar el trámite.
 `;
 
     window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;

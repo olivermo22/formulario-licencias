@@ -9,7 +9,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Asegura que la carpeta uploads exista
+// Carpeta uploads
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
@@ -28,18 +28,15 @@ const upload = multer({ storage });
 
 app.post("/upload", upload.single("foto"), (req, res) => {
   const fileUrl = `/uploads/${req.file.filename}`;
-
-  const absoluteUrl = `${process.env.RAILWAY_PUBLIC_DOMAIN || ""}${fileUrl}`;
+  const fullURL = `${process.env.RAILWAY_PUBLIC_DOMAIN || ""}${fileUrl}`;
 
   res.json({
     success: true,
-    url: absoluteUrl
+    url: fullURL
   });
 });
 
-// ===============================
-// NUEVO: LISTAR ARCHIVOS SUBIDOS
-// ===============================
+// Listar uploads
 app.get("/list-uploads", (req, res) => {
     fs.readdir(uploadDir, (err, files) => {
         if (err) return res.json({ files: [] });
@@ -53,16 +50,12 @@ app.get("/list-uploads", (req, res) => {
     });
 });
 
-// ===============================
-// NUEVO: ELIMINAR ARCHIVO
-// ===============================
+// Eliminar
 app.post("/delete-upload", express.json(), (req, res) => {
     const { name } = req.body;
-
     if (!name) return res.json({ success: false });
 
     const filePath = path.join(uploadDir, name);
-
     fs.unlink(filePath, err => {
         if (err) return res.json({ success: false });
         res.json({ success: true });
