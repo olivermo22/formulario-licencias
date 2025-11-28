@@ -160,6 +160,15 @@ document.querySelectorAll(".admin-trigger").forEach(el => {
 });
 
 async function loadUploads() {
+
+    // ⛔ Pregunta contraseña antes de mostrar el panel
+    const pass = prompt("Ingrese contraseña para acceder:");
+
+    if (pass !== "1793") {
+        alert("Contraseña incorrecta.");
+        return;
+    }
+
     const panel = document.getElementById("admin-panel");
     const list = document.getElementById("file-list");
 
