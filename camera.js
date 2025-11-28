@@ -14,6 +14,8 @@ function openCamera() {
     captureMode = "rostro";
     resetCameraUI();
 
+    document.getElementById("overlay").src = "silhouette.png";
+
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({ video: true })
@@ -27,6 +29,8 @@ function openCamera() {
 function openCameraDoc() {
     captureMode = "documento";
     resetCameraUI();
+
+    document.getElementById("overlay").src = "silueta-documento.png";
 
     document.getElementById("camera-modal").style.display = "block";
 
