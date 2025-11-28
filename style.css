@@ -236,3 +236,24 @@ select:focus {
     font-weight: 700;
     font-size: 15px;
 }
+
+#signature-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    padding: 20px;
+}
+
+#signature-canvas {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 380px;
+    height: 300px;
+    display: block;
+    margin: 40px auto 20px;
+    touch-action: none; /* necesario para dibujar en móvil */
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+}

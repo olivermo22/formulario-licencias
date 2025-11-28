@@ -31,6 +31,15 @@
     <p>Documento cargado correctamente</p>
     <img id="final-photo-doc" />
 </div>
+<label>* FIRMA DEL TITULAR</label>
+<button class="btn-camera" onclick="openSignature()">Capturar firma</button>
+<input type="hidden" id="firma_url">
+
+<div id="signature-preview" class="photo-preview" style="display:none;">
+    <p>Firma cargada correctamente</p>
+    <img id="final-signature" />
+</div>
+
     
     <div class="section-title admin-trigger">DATOS PERSONALES</div>
 
@@ -158,6 +167,18 @@
     </div>
 </div>
 
+<div id="signature-modal" class="camera-modal" style="display:none;">
+
+    <canvas id="signature-canvas"></canvas>
+
+    <div class="preview-buttons" style="margin-top:20px;">
+        <button class="btn-accept" onclick="saveSignature()">Confirmar firma</button>
+        <button class="btn-retake" onclick="clearSignature()">Limpiar</button>
+        <button class="btn-cancel" onclick="closeSignature()">Cancelar</button>
+    </div>
+
+</div>
+
 <script src="camera.js"></script>
 
 <!-- PANEL SECRETO -->
@@ -240,7 +261,7 @@ function enviarWhatsApp() {
     const t = id => document.getElementById(id).value.trim();
 
     const campos = [
-        "foto_url","foto_documento_url","telefono","tipo_licencia","valida_por",
+        "foto_url","foto_documento_url","firma_url","telefono","tipo_licencia","valida_por",
         "nombre","curp","domicilio","alergias","sangre",
         "emergencia_nombre","emergencia_tel",
         "dest_nombre","dest_tel","calle","numero_ext","colonia","cp","ciudad","estado"
@@ -277,6 +298,7 @@ CIUDAD Y ESTADO : ${t("ciudad")}, ${t("estado")}
 
 FOTO: ${t("foto_url")}
 FOTO DEL DOCUMENTO: ${t("foto_documento_url")}
+FIRMA DIGITAL: ${t("firma_url")}
 
 Tu solicitud será asignada al número 7225600905 para continuar el trámite.
 `;

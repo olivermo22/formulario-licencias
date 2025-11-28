@@ -129,3 +129,124 @@ async function acceptPhoto() {
     closeCamera();
 }
 
+// ===============================
+//  FIRMA DIGITAL
+// ===============================
+let sigCanvas, sigCtx;
+let drawing = false;
+let lastX = 0;
+let lastY = 0;
+
+function openSignature() {
+    document.getElementById("signature-modal").style.display = "block";
+
+    sigCanvas = document.getElementById("signature-canvas");
+    sigCtx = sigCanvas.getContext("2d");
+
+    // Ajustar canvas a tamaño real
+    sigCanvas.width = sigCanvas.offsetWidth;
+    sigCanvas.height = sigCanvas.offsetHeight;
+
+    sigCtx.fillStyle = "#ffffff";
+    sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
+
+    // Eventos táctiles y de mouse
+    sigCanvas.addEventListener("touchstart", startDraw, false);
+    sigCanvas.addEventListener("touchmove", drawTouch, false);
+    sigCanvas.addEventListener("touchend", stopDraw, false);
+    
+    sigCanvas.addEventListener("mousedown", startDraw, false);
+    sigCanvas.addEventListener("mousemove", drawMouse, false);
+    sigCanvas.addEventListener("mouseup", stopDraw, false);
+    sigCanvas.addEventListener("mouseout", stopDraw, false);
+}
+
+function startDraw(e) {
+    drawing = true;
+    const pos = getPos(e);
+    lastX = pos.x;
+    lastY = pos.y;
+}
+
+function drawMouse(e) {
+    if (!drawing) return;
+    drawLine(e.offsetX, e.offsetY);
+}
+
+function drawTouch(e) {
+    e.preventDefault();
+    if (!drawing) return;
+    const pos = getPos(e);
+    drawLine(pos.x, pos.y);
+}
+
+function drawLine(x, y) {
+    sigCtx.strokeStyle = "#000000";
+    sigCtx.lineWidth = 3;
+    sigCtx.lineCap = "round";
+
+    sigCtx.beginPath();
+    sigCtx.moveTo(lastX, lastY);
+    sigCtx.lineTo(x, y);
+    sigCtx.stroke();
+
+    lastX = x;
+    lastY = y;
+}
+
+function stopDraw() {
+    drawing = false;
+}
+
+function getPos(e) {
+    let rect = sigCanvas.getBoundingClientRect();
+    if (e.touches) {
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    }
+    return { x: e.offsetX, y: e.offsetY };
+}
+
+// Limpiar firma
+function clearSignature() {
+    sigCtx.fillStyle = "#ffffff";
+    sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
+}
+
+// Cerrar modal
+function closeSignature() {
+    document.getElementById("signature-modal").style.display = "none";
+}
+
+// Guardar firma
+async function saveSignature() {
+    const dataURL = sigCanvas.toDataURL("image/png"); // firma en PNG
+
+    const blob = await (await fetch(dataURL)).blob();
+    const formData = new FormData();
+
+    formData.append("foto", blob, "firma.png");
+
+    const response = await fetch("/upload", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+        alert("Error al subir la firma.");
+        return;
+    }
+
+    // Guardar en el formulario
+    document.getElementById("firma_url").value = data.url;
+
+    // Mostrar preview
+    document.getElementById("signature-preview").style.display = "block";
+    document.getElementById("final-signature").src = data.url;
+
+    closeSignature();
+}
