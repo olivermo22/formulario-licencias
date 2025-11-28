@@ -49,14 +49,14 @@
     <label>* CURP</label>
     <input class="input" id="curp" maxlength="18">
 
-    <label>* ¿Acepta tener domicilio de Guerrero?</label>
+    <label>* CON BASE EN LOS LINEAMIENTOS… ¿ESTÁ DE ACUERDO?</label>
     <select class="input" id="domicilio">
         <option value="">Seleccionar…</option>
         <option>SI</option>
     </select>
 
     <small>
-        Como la licencia se tramita en Guerrero, se requiere usar un domicilio de aquí.
+        Como la licencia se tramita en Guerrero, se pide que salga con un domicilio de aquí. En caso de no tener domicilio de Guerrero, la licencia saldrá con el domicilio del ayuntamiento donde se realiza el trámite.
     </small>
 
     <label>* ALERGIAS / RESTRICCIONES</label>
@@ -103,12 +103,22 @@
 
     <label>* ESTADO</label>
     <select class="input" id="estado">
-        <option value="">Seleccionar…</option>
-        <option>Guerrero</option>
-        <option>Estado de México</option>
-        <option>CDMX</option>
-        <option>Jalisco</option>
-        <option>...todos los demás...</option>
+        <option>Aguascalientes</option><option>Baja California</option>
+        <option>Baja California Sur</option><option>Campeche</option>
+        <option>CDMX</option><option>Chiapas</option>
+        <option>Chihuahua</option><option>Coahuila</option>
+        <option>Colima</option><option>Durango</option>
+        <option>Estado de México</option><option>Guanajuato</option>
+        <option>Guerrero</option><option>Hidalgo</option>
+        <option>Jalisco</option><option>Michoacán</option>
+        <option>Morelos</option><option>Nayarit</option>
+        <option>Nuevo León</option><option>Oaxaca</option>
+        <option>Puebla</option><option>Querétaro</option>
+        <option>Quintana Roo</option><option>San Luis Potosí</option>
+        <option>Sinaloa</option><option>Sonora</option>
+        <option>Tabasco</option><option>Tamaulipas</option>
+        <option>Tlaxcala</option><option>Veracruz</option>
+        <option>Yucatán</option><option>Zacatecas</option>
     </select>
 
     <button class="btn-submit" onclick="enviarWhatsApp()">Enviar</button>
@@ -152,16 +162,21 @@ TIPO DE LICENCIA: ${t("tipo_licencia")}
 VALIDA POR: ${t("valida_por")}
 NOMBRE: ${t("nombre")}
 CURP: ${t("curp")}
-
+DOMICILIO DE GUERRERO ACEPTADO : SI
 ALERGIAS: ${t("alergias")}
 TIPO DE SANGRE: ${t("sangre")}
 CONTACTO EMERGENCIA: ${t("emergencia_nombre")} (${t("emergencia_tel")})
 
-ENVÍO:
-Destinatario: ${t("dest_nombre")}
-Teléfono: ${t("dest_tel")}
-Dirección: ${t("calle")} #${t("numero_ext")}, ${t("colonia")}
-CP: ${t("cp")} Ciudad: ${t("ciudad")} Estado: ${t("estado")}
+DATOS DE ENVÍO
+NOMBRE DESTINATARIO : ${t("dest_nombre")}
+TELÉFONO DESTINATARIO : ${t("dest_tel")}
+CALLE : ${t("calle")}
+NÚMERO : ${t("numero_ext")}
+COLONIA : ${t("colonia")}
+CP : ${t("cp")}
+CIUDAD Y ESTADO : ${t("ciudad")}, ${t("estado")}
+
+Tu solicitud será asignada al número 7225600905 para continuar el trámite.
 `;
 
     window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;
