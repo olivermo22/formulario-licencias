@@ -74,13 +74,14 @@ label {
 }
 
 #overlay {
-    width: 100%;
-    max-width: 400px;
+    width: 90%;
+    max-width: 380px;
     position: absolute;
-    top: 80px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%); /* centra x y y */
     opacity: 0.6;
+    pointer-events: none; /* evita bloquear el video */
 }
 
 .btn-capture, .btn-close {
