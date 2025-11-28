@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud Licencia de Conducir</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="form-wrapper">
+    
+    <h1>SOLICITUD LICENCIA DE CONDUCIR</h1>
+
+    <!-- BOTÓN PARA ABRIR LA CÁMARA -->
+    <label>* FOTO DEL TITULAR (TOMAR CON CÁMARA)</label>
+    <button class="btn-camera" onclick="openCamera()">Tomar fotografía</button>
+    <input type="hidden" id="foto_url">
+
+    <div id="photo-preview" class="photo-preview" style="display:none;">
+        <p>Foto cargada correctamente</p>
+        <img id="final-photo" />
+    </div>
+
+    <div class="section-title">DATOS PERSONALES</div>
+
+    <label>* TELÉFONO (WHATSAPP)</label>
+    <input class="input" id="telefono" maxlength="10">
+
+    <label>* TIPO DE LICENCIA</label>
+    <select class="input" id="tipo_licencia">
+        <option value="">Seleccionar…</option>
+        <option>CHOFER - C</option>
+        <option>AUTOMOVILISTA - A</option>
+        <option>MOTOCICLISTA - M</option>
+    </select>
+
+    <label>* VALIDA POR</label>
+    <select class="input" id="valida_por">
+        <option value="">Seleccionar…</option>
+        <option>3 AÑOS $650</option>
+        <option>5 AÑOS $700</option>
+    </select>
+
+    <label>* NOMBRE COMPLETO</label>
+    <input class="input" id="nombre">
+
+    <label>* CURP</label>
+    <input class="input" id="curp" maxlength="18">
+
+    <label>* ¿Acepta tener domicilio de Guerrero?</label>
+    <select class="input" id="domicilio">
+        <option value="">Seleccionar…</option>
+        <option>SI</option>
+    </select>
+
+    <small>
+        Como la licencia se tramita en Guerrero, se requiere usar un domicilio de aquí.
+    </small>
+
+    <label>* ALERGIAS / RESTRICCIONES</label>
+    <input class="input" id="alergias">
+
+    <label>* TIPO DE SANGRE</label>
+    <select class="input" id="sangre">
+        <option value="">Seleccionar…</option>
+        <option>AB+</option><option>AB-</option>
+        <option>A+</option><option>A-</option>
+        <option>B+</option><option>B-</option>
+        <option>O+</option><option>O-</option>
+        <option>DESCONOCE</option>
+    </select>
+
+    <label>* CONTACTO EN CASO DE EMERGENCIA (NOMBRE)</label>
+    <input class="input" id="emergencia_nombre">
+
+    <label>* TELÉFONO EMERGENCIA</label>
+    <input class="input" id="emergencia_tel" maxlength="10">
+
+    <div class="section-title">DATOS PARA ENVÍO</div>
+
+    <label>* NOMBRE DESTINATARIO</label>
+    <input class="input" id="dest_nombre">
+
+    <label>* TELÉFONO DESTINATARIO</label>
+    <input class="input" id="dest_tel" maxlength="10">
+
+    <label>* CALLE</label>
+    <input class="input" id="calle">
+
+    <label>* NUM EXT</label>
+    <input class="input" id="numero_ext">
+
+    <label>* COLONIA</label>
+    <input class="input" id="colonia">
+
+    <label>* CÓDIGO POSTAL</label>
+    <input class="input" id="cp" maxlength="5">
+
+    <label>* CIUDAD</label>
+    <input class="input" id="ciudad">
+
+    <label>* ESTADO</label>
+    <select class="input" id="estado">
+        <option value="">Seleccionar…</option>
+        <option>Guerrero</option>
+        <option>Estado de México</option>
+        <option>CDMX</option>
+        <option>Jalisco</option>
+        <option>...todos los demás...</option>
+    </select>
+
+    <button class="btn-submit" onclick="enviarWhatsApp()">Enviar</button>
+
+</div>
+
+<!-- MODAL DE CÁMARA -->
+<div id="camera-modal" class="camera-modal">
+    <video id="camera" autoplay></video>
+    <img id="overlay" src="public/silhouette.png">
+    <button id="btn-capture" class="btn-capture" onclick="capture()">Capturar</button>
+    <button id="btn-close" class="btn-close" onclick="closeCamera()">Cerrar</button>
+</div>
+
+<script src="camera.js"></script>
+<script>
+function enviarWhatsApp() {
+    const t = id => document.getElementById(id).value.trim();
+
+    const campos = [
+        "foto_url","telefono","tipo_licencia","valida_por",
+        "nombre","curp","domicilio","alergias","sangre",
+        "emergencia_nombre","emergencia_tel",
+        "dest_nombre","dest_tel","calle","numero_ext","colonia","cp","ciudad","estado"
+    ];
+
+    for (let c of campos) {
+        if (!t(c)) return alert("Completa todos los campos.");
+    }
+
+    const folio = Math.floor(10000 + Math.random() * 90000);
+
+    const mensaje = `
+SOLICITUD LICENCIA DE CONDUCIR
+Folio #${folio}
+
+FOTO: ${t("foto_url")}
+
+TELÉFONO: ${t("telefono")}
+TIPO DE LICENCIA: ${t("tipo_licencia")}
+VALIDA POR: ${t("valida_por")}
+NOMBRE: ${t("nombre")}
+CURP: ${t("curp")}
+
+ALERGIAS: ${t("alergias")}
+TIPO DE SANGRE: ${t("sangre")}
+CONTACTO EMERGENCIA: ${t("emergencia_nombre")} (${t("emergencia_tel")})
+
+ENVÍO:
+Destinatario: ${t("dest_nombre")}
+Teléfono: ${t("dest_tel")}
+Dirección: ${t("calle")} #${t("numero_ext")}, ${t("colonia")}
+CP: ${t("cp")} Ciudad: ${t("ciudad")} Estado: ${t("estado")}
+`;
+
+    window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;
+}
+</script>
+
+</body>
+</html>

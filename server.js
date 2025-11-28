@@ -1,55 +1,30 @@
 import express from "express";
-import fs from "fs";
+import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 
-app.use(express.json({ limit: "25mb" }));
-app.use(express.static("public"));
-app.use("/uploads", express.static("uploads"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const UPLOAD_DIR = "./uploads";
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
+app.use(express.static(__dirname));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// =======================
-//     SUBIR IMAGEN
-// =======================
-app.post("/api/upload", (req, res) => {
-    try {
-        const base64 = req.body.foto.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64, "base64");
-
-        const filename = `foto_${Date.now()}.jpg`;
-        fs.writeFileSync(`${UPLOAD_DIR}/${filename}`, buffer);
-
-        const url = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
-
-        res.json({ url });
-
-    } catch (e) {
-        console.error("Error guardando archivo:", e);
-        res.status(500).json({ error: "No se pudo guardar imagen" });
+const storage = multer.diskStorage({
+    destination: (_, __, cb) => cb(null, "uploads/"),
+    filename: (_, file, cb) => {
+        const unique = Date.now() + "_" + file.originalname;
+        cb(null, unique);
     }
 });
 
-// =======================
-//   LIMPIEZA AUTOMÁTICA
-// =======================
-setInterval(() => {
-    const now = Date.now();
-    const limite = 15 * 24 * 60 * 60 * 1000;
+const upload = multer({ storage });
 
-    fs.readdirSync(UPLOAD_DIR).forEach(file => {
-        const full = `${UPLOAD_DIR}/${file}`;
-        const stats = fs.statSync(full);
+app.post("/upload", upload.single("foto"), (req, res) => {
+    const url = `/uploads/${req.file.filename}`;
+    res.json({ url });
+});
 
-        if (now - stats.mtimeMs > limite) {
-            fs.unlinkSync(full);
-            console.log("🗑 Archivo eliminado:", file);
-        }
-    });
-}, 60 * 60 * 1000); // cada hora
-
-// =======================
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log("Servidor en puerto", PORT));
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log("Servidor iniciado en puerto " + port));
