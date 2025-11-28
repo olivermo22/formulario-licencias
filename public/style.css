@@ -4,7 +4,6 @@ body {
     margin:0;
 }
 
-/* CONTENEDOR PRINCIPAL */
 .container {
     max-width:500px;
     margin:auto;
@@ -14,13 +13,8 @@ body {
     margin-top:20px;
 }
 
-.label-title { 
-    font-weight:bold; 
-    margin-top:20px; 
-    display:block; 
-}
+.label-title { font-weight:bold; margin-top:20px; display:block; }
 
-/* CAMPOS */
 input, select, textarea {
     width:100%;
     padding:10px;
@@ -29,7 +23,6 @@ input, select, textarea {
     border-radius:6px;
 }
 
-/* BOTÓN */
 .btn-primary {
     background:#28a745;
     color:white;
@@ -42,28 +35,42 @@ input, select, textarea {
     box-shadow:0 3px 10px rgba(0,0,0,0.2);
 }
 
-/* ÁREA DE CÁMARA */
-.cam-wrapper {
-    margin-top:15px;
+/* --- MODAL --- */
+
+.modal {
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
 }
 
-/* Contenedor RELATIVO que envuelve al video y la silueta */
+.modal-content {
+    background:#fff;
+    width:90%;
+    max-width:420px;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+}
+
 .cam-inner {
     position:relative;
     width:100%;
+    margin-top:10px;
 }
 
-/* Video */
 video {
     width:100%;
     border-radius:10px;
 }
 
-/* Silueta superpuesta (corregido) */
 .silueta-overlay {
     position:absolute;
-    top:0;
-    left:0;
+    top:0; left:0;
     width:100%;
     height:100%;
     object-fit:contain;
@@ -71,21 +78,35 @@ video {
     pointer-events:none;
 }
 
-/* Mensaje debajo */
-.cam-msg {
-    text-align:center;
-    font-size:14px;
-    margin-top:5px;
+.preview-modal {
+    width:100%;
+    border-radius:10px;
+    display:none;
+    margin-top:10px;
 }
 
-/* Previsualización */
+.modal-btn {
+    background:#28a745;
+    color:white;
+    border:none;
+    padding:12px;
+    width:100%;
+    margin-top:10px;
+    border-radius:8px;
+    font-size:16px;
+}
+
+.modal-btn-secondary {
+    background:#999;
+}
+
 .preview-img {
     width:100%;
     border-radius:10px;
     margin-top:10px;
 }
 
-/* LOADER */
+/* Loader */
 .loader {
     position:fixed;
     top:0; left:0;
@@ -107,11 +128,8 @@ video {
     animation:spin 1s linear infinite;
 }
 
-@keyframes spin {
-    100% { transform:rotate(360deg); }
-}
+@keyframes spin { 100% { transform:rotate(360deg); } }
 
-/* TOAST */
 .toast {
     position:fixed;
     bottom:20px;
@@ -122,5 +140,4 @@ video {
     padding:12px 20px;
     border-radius:20px;
     display:none;
-    z-index:99999;
 }

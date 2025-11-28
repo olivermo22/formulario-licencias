@@ -1,102 +1,101 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Solicitud Licencia de Conducir</title>
-<link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<link rel="stylesheet" href="style.css">
+<title>Solicitud Licencia</title>
 </head>
 
 <body>
 
 <div class="container">
+
     <h2>SOLICITUD LICENCIA DE CONDUCIR</h2>
 
-    <!-- FOTO -->
     <label class="label-title">* FOTO DEL SOLICITANTE</label>
-    <button id="btnFoto" class="btn-primary">Capturar foto</button>
+    <button class="btn-primary" onclick="abrirModal()">Capturar foto</button>
 
-    <!-- Vista cámara -->
-    <div id="camContainer" class="cam-wrapper" style="display:none;">
+    <img id="previewFinal" class="preview-img" style="display:none;">
 
-    <div class="cam-inner">
-        <video id="video" autoplay playsinline></video>
+    <!-- FORMULARIO AQUÍ (no lo repito para evitar bloque enorme) -->
 
-        <!-- SILUETA PERFECTAMENTE CENTRADA -->
-        <img src="silueta.png" class="silueta-overlay" />
+</div>
+
+<!-- =========================== -->
+<!--           MODAL             -->
+<!-- =========================== -->
+
+<div id="modalFoto" class="modal">
+
+    <div class="modal-content">
+
+        <h3>Tomar fotografía</h3>
+
+        <!-- Vista de cámara -->
+        <div id="camContainer" class="cam-inner">
+            <video id="video" autoplay playsinline></video>
+            <img src="silueta.png" class="silueta-overlay">
+        </div>
+
+        <!-- Vista previa después de capturar -->
+        <img id="previewModal" class="preview-modal">
+
+        <button id="btnTomar" class="modal-btn" onclick="capturar()">Tomar foto</button>
+
+        <button id="btnRepetir" class="modal-btn modal-btn-secondary" style="display:none"
+                onclick="repetirFoto()">Tomar de nuevo</button>
+
+        <button id="btnConfirmar" class="modal-btn" style="display:none"
+                onclick="confirmarFoto()">Confirmar foto</button>
+
+        <button class="modal-btn modal-btn-secondary" onclick="cerrarModal()">Cancelar</button>
+
     </div>
 
-    <p class="cam-msg">Alinea tu rostro con la silueta y toca para tomar la foto</p>
 </div>
 
-
-    <!-- Imagen final -->
-    <img id="preview" class="preview-img" style="display:none;" />
-
-    <hr>
-
-    <!-- FORMULARIO -->
-    <label>* NÚMERO DE TELÉFONO</label>
-    <input id="telefono" type="text" />
-
-    <label>* TIPO DE LICENCIA</label>
-    <select id="licencia">
-        <option value="">Seleccionar</option>
-        <option value="Automovilista">Automovilista</option>
-        <option value="Motociclista">Motociclista</option>
-        <option value="Chofer">Chofer</option>
-    </select>
-
-    <label>* VALIDA POR</label>
-    <select id="vigencia">
-        <option value="">Seleccionar</option>
-        <option value="3 años">3 años</option>
-        <option value="5 años">5 años</option>
-    </select>
-
-    <label>* NOMBRE COMPLETO</label>
-    <input id="nombre" type="text" />
-
-    <label>* CURP</label>
-    <input id="curp" type="text" />
-
-    <label>* CONTACTO DE EMERGENCIA</label>
-    <input id="emergencia" type="text" />
-
-    <label>* DIRECCIÓN COMPLETA</label>
-    <textarea id="direccion"></textarea>
-
-    <button class="btn-primary" onclick="enviarWhatsApp()">Enviar WhatsApp</button>
-</div>
-
-<!-- Loader -->
-<div id="loader" class="loader" style="display:none;">
+<div id="loader" class="loader">
     <div class="spinner"></div>
-    <p>Procesando imagen…</p>
+    <p>Procesando...</p>
 </div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-let stream = null;
-let fotoFinalBase64 = null;
-let fotoURLServidor = null;
+let stream;
+let imagenBase64 = "";
 
-// ⬇️ Mostrar cámara
-document.getElementById("btnFoto").onclick = async () => {
-    const cam = document.getElementById("camContainer");
-    cam.style.display = "block";
+/* ----------- MODAL ----------- */
 
-    stream = await navigator.mediaDevices.getUserMedia({ video:true });
-    const video = document.getElementById("video");
-    video.srcObject = stream;
+function abrirModal(){
+    document.getElementById("modalFoto").style.display = "flex";
+    iniciarCamara();
+}
 
-    // click para capturar
-    video.onclick = () => capturar();
-};
+function cerrarModal(){
+    document.getElementById("modalFoto").style.display = "none";
+    detenerCamara();
+}
 
-// ⬇️ Capturar foto
-async function capturar(){
-    showLoader();
+/* ----------- CÁMARA ----------- */
 
+function iniciarCamara(){
+    navigator.mediaDevices.getUserMedia({ video:true })
+    .then(s => {
+        stream = s;
+        document.getElementById("video").srcObject = s;
+    })
+}
+
+function detenerCamara(){
+    if(stream){
+        stream.getTracks().forEach(t => t.stop());
+    }
+}
+
+/* ----------- CAPTURAR ----------- */
+
+function capturar(){
     const video = document.getElementById("video");
 
     const canvas = document.createElement("canvas");
@@ -104,95 +103,45 @@ async function capturar(){
     canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video,0,0);
 
-    fotoFinalBase64 = canvas.toDataURL("image/jpeg", 0.9);
+    imagenBase64 = canvas.toDataURL("image/jpeg",0.9);
 
-    // enviar al servidor
-    await subirFoto(fotoFinalBase64);
+    document.getElementById("previewModal").src = imagenBase64;
+    document.getElementById("previewModal").style.display = "block";
 
-    hideLoader();
-
-    // mostrar preview
-    const preview = document.getElementById("preview");
-    preview.src = fotoFinalBase64;
-    preview.style.display = "block";
-
-    stopCamera();
+    document.getElementById("btnTomar").style.display = "none";
+    document.getElementById("btnRepetir").style.display = "block";
+    document.getElementById("btnConfirmar").style.display = "block";
 }
 
-// ⬇️ Subir imagen a Railway
-async function subirFoto(base64){
-    try {
-        const res = await fetch("/api/upload", {
-            method: "POST",
-            headers: { "Content-Type":"application/json" },
-            body: JSON.stringify({ imagen: base64 })
-        });
-
-        const data = await res.json();
-        fotoURLServidor = data.url;
-        toast("Foto guardada correctamente");
-    } catch(e){
-        console.error(e);
-        toast("Error al subir foto");
-    }
+function repetirFoto(){
+    document.getElementById("previewModal").style.display = "none";
+    document.getElementById("btnTomar").style.display = "block";
+    document.getElementById("btnRepetir").style.display = "none";
+    document.getElementById("btnConfirmar").style.display = "none";
 }
 
-// ⬇️ Apagar cámara
-function stopCamera(){
-    if(stream){
-        stream.getTracks().forEach(t => t.stop());
-    }
+/* ----------- CONFIRMAR ----------- */
+
+function confirmarFoto(){
+
+    cerrarModal();
+
+    document.getElementById("previewFinal").src = imagenBase64;
+    document.getElementById("previewFinal").style.display = "block";
+
+    toast("Foto guardada correctamente");
 }
 
-// ⬇️ Enviar WhatsApp con todo el formulario
-function enviarWhatsApp(){
-    if(!fotoURLServidor){
-        toast("Primero captura tu foto");
-        return;
-    }
+/* ----------- TOAST ----------- */
 
-    const tel = telefono.value;
-    const lic = licencia.value;
-    const vig = vigencia.value;
-    const nom = nombre.value;
-    const c = curp.value;
-    const em = emergencia.value;
-    const dir = direccion.value;
-
-    const msg = `
-*SOLICITUD LICENCIA DE CONDUCIR*
-
-📸 Foto: ${fotoURLServidor}
-
-📱 Teléfono: ${tel}
-🪪 Tipo de licencia: ${lic}
-⏳ Vigencia: ${vig}
-👤 Nombre: ${nom}
-🔤 CURP: ${c}
-⚠️ Emergencia: ${em}
-🏠 Dirección:
-${dir}
-`;
-
-    window.location.href =
-      "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
-}
-
-// ⬇️ Loader
-function showLoader(){ document.getElementById("loader").style.display="flex"; }
-function hideLoader(){ document.getElementById("loader").style.display="none"; }
-
-// ⬇️ Mensajes flotantes
 function toast(msg){
-    const t = document.createElement("div");
-    t.className = "toast";
+    const t = document.getElementById("toast");
     t.innerText = msg;
-    document.body.appendChild(t);
-    setTimeout(()=>{ t.remove(); },3000);
+    t.style.display = "block";
+    setTimeout(()=> t.style.display="none",2500);
 }
-
 </script>
 
 </body>
