@@ -1,396 +1,194 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Solicitud Licencia de Conducir</title>
-
-<style>
-    body {
-        background: #f2f2f2;
-        font-family: "Inter", sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-    }
-
-    .form-wrapper {
-        width: 100%;
-        max-width: 600px;
-        background: white;
-        padding: 40px;
-        margin: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-        font-size: 22px;
-        font-weight: 700;
-        margin-bottom: 25px;
-        text-transform: uppercase;
-    }
-
-    label {
-        margin-top: 15px;
-        display: block;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .input {
-        width: 100%;
-        padding: 14px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        margin-top: 6px;
-        margin-bottom: 18px;
-        font-size: 15px;
-    }
-
-    .btn {
-        padding: 15px;
-        background: #25d366;
-        width: 100%;
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transition: 0.2s;
-    }
-
-    .btn:hover { background: #1ebe5d; }
-
-    .btn-photo { background: #4CAF50; margin-bottom: 20px; }
-
-    #loader {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        padding: 25px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-        z-index: 999;
-    }
-
-    #toast {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #202020;
-        color: white;
-        padding: 14px 20px;
-        border-radius: 25px;
-        font-size: 15px;
-        display: none;
-    }
-
-    #video { width: 100%; display: none; position: relative; z-index: 50; }
-    #canvas { display: none; }
-    #preview { width: 100%; margin-top: 10px; border-radius: 10px; }
-
-</style>
+<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<div class="form-wrapper">
-
-    <h1>SOLICITUD LICENCIA DE CONDUCIR</h1>
+<div class="container">
+    <h2>SOLICITUD LICENCIA DE CONDUCIR</h2>
 
     <!-- FOTO -->
-    <label>* FOTO DEL SOLICITANTE</label>
-    <button class="btn btn-photo" onclick="capturar()">Capturar foto</button>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-    <img id="preview">
+    <label class="label-title">* FOTO DEL SOLICITANTE</label>
+    <button id="btnFoto" class="btn-primary">Capturar foto</button>
 
-    <!-- CAMPOS -->
-    <label>* NUM TELÉFONO</label>
-    <input class="input" id="telefono">
+    <!-- Vista cámara -->
+    <div id="camContainer" class="cam-wrapper" style="display:none;">
+        <video id="video" autoplay playsinline></video>
+
+        <!-- Silueta -->
+        <img src="silueta.png" class="silueta" />
+
+        <p class="cam-msg">Alinea tu rostro con la silueta y toca para tomar la foto</p>
+    </div>
+
+    <!-- Imagen final -->
+    <img id="preview" class="preview-img" style="display:none;" />
+
+    <hr>
+
+    <!-- FORMULARIO -->
+    <label>* NÚMERO DE TELÉFONO</label>
+    <input id="telefono" type="text" />
 
     <label>* TIPO DE LICENCIA</label>
-    <select class="input" id="tipo_licencia">
-        <option>CHOFER - C</option>
-        <option>AUTOMOVILISTA - A</option>
-        <option>MOTOCICLISTA - M</option>
+    <select id="licencia">
+        <option value="">Seleccionar</option>
+        <option value="Automovilista">Automovilista</option>
+        <option value="Motociclista">Motociclista</option>
+        <option value="Chofer">Chofer</option>
     </select>
 
     <label>* VALIDA POR</label>
-    <select class="input" id="valida_por">
-        <option>3 AÑOS $650</option>
-        <option>5 AÑOS $700</option>
+    <select id="vigencia">
+        <option value="">Seleccionar</option>
+        <option value="3 años">3 años</option>
+        <option value="5 años">5 años</option>
     </select>
 
     <label>* NOMBRE COMPLETO</label>
-    <input class="input" id="nombre">
+    <input id="nombre" type="text" />
 
     <label>* CURP</label>
-    <input class="input" id="curp">
+    <input id="curp" type="text" />
 
-    <label>* ACEPTA DOMICILIO EN GUERRERO</label>
-    <select class="input" id="domicilio">
-        <option>SI</option>
-    </select>
+    <label>* CONTACTO DE EMERGENCIA</label>
+    <input id="emergencia" type="text" />
 
-    <label>* ALERGIAS</label>
-    <input class="input" id="alergias">
+    <label>* DIRECCIÓN COMPLETA</label>
+    <textarea id="direccion"></textarea>
 
-    <label>* TIPO DE SANGRE</label>
-    <select class="input" id="sangre">
-        <option>AB+</option><option>AB-</option>
-        <option>A+</option><option>A-</option>
-        <option>B+</option><option>B-</option>
-        <option>O+</option><option>O-</option>
-        <option>DESCONOCE</option>
-    </select>
-
-    <label>* CONTACTO EMERGENCIA</label>
-    <input class="input" id="emergencia_nombre">
-    <label>* TELÉFONO</label>
-    <input class="input" id="emergencia_tel">
-
-    <h3>DATOS DE ENVÍO</h3>
-
-    <label>* NOMBRE DESTINATARIO</label>
-    <input class="input" id="dest_nombre">
-    <label>* TELÉFONO DESTINATARIO</label>
-    <input class="input" id="dest_tel">
-    <label>* CALLE</label>
-    <input class="input" id="calle">
-    <label>* NÚMERO EXT</label>
-    <input class="input" id="numero_ext">
-    <label>* COLONIA</label>
-    <input class="input" id="colonia">
-    <label>* CP</label>
-    <input class="input" id="cp">
-    <label>* CIUDAD</label>
-    <input class="input" id="ciudad">
-    <label>* ESTADO</label>
-    <input class="input" id="estado">
-
-    <button class="btn" onclick="enviarWhatsApp()">Enviar</button>
-
+    <button class="btn-primary" onclick="enviarWhatsApp()">Enviar WhatsApp</button>
 </div>
 
-<div id="loader">Procesando imagen...</div>
-<div id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+<!-- Loader -->
+<div id="loader" class="loader" style="display:none;">
+    <div class="spinner"></div>
+    <p>Procesando imagen…</p>
+</div>
 
 <script>
-// ================================
-// CONFIG
-// ================================
-let session = null;
-const serverURL = "https://TU-SERVER.up.railway.app/api/upload";
+let stream = null;
+let fotoFinalBase64 = null;
+let fotoURLServidor = null;
 
-// ================================
-// UTILS
-// ================================
-function toast(msg) {
-    const t = document.getElementById("toast");
-    t.innerText = msg;
-    t.style.display = "block";
-    setTimeout(() => t.style.display = "none", 2500);
-}
+// ⬇️ Mostrar cámara
+document.getElementById("btnFoto").onclick = async () => {
+    const cam = document.getElementById("camContainer");
+    cam.style.display = "block";
 
-function showLoader(){ document.getElementById("loader").style.display="block"; }
-function hideLoader(){ document.getElementById("loader").style.display="none"; }
+    stream = await navigator.mediaDevices.getUserMedia({ video:true });
+    const video = document.getElementById("video");
+    video.srcObject = stream;
 
-// ================================
-// CARGAR MODELO
-// ================================
-async function loadModel(){
-    session = await ort.InferenceSession.create("./models/u2netp.onnx");
-    console.log("Modelo cargado.");
-}
-loadModel();
+    // click para capturar
+    video.onclick = () => capturar();
+};
 
-// ================================
-// CAPTURAR
-// ================================
-async function capturar() {
-    console.log("capturar() ejecutado");
+// ⬇️ Capturar foto
+async function capturar(){
+    showLoader();
 
     const video = document.getElementById("video");
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    fotoFinalBase64 = canvas.toDataURL("image/jpeg", 0.9);
+
+    // enviar al servidor
+    await subirFoto(fotoFinalBase64);
+
+    hideLoader();
+
+    // mostrar preview
     const preview = document.getElementById("preview");
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        preview.style.display = "none";
-        video.style.display = "block";
-
-        console.log("Cámara abierta");
-
-        await new Promise(r => setTimeout(r, 500));
-        console.log("videoWidth =", video.videoWidth, "videoHeight =", video.videoHeight);
-
-        toast("Acomódate y toca el video para tomar foto");
-
-        video.onclick = async () => {
-            console.log("CLICK detectado en el video");
-            showLoader();
-
-            const canvas = document.getElementById("canvas");
-            const ctx = canvas.getContext("2d");
-
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
-
-            stream.getTracks().forEach(t => t.stop());
-            video.style.display = "none";
-
-            await procesarImagen(canvas);
-
-            hideLoader();
-            toast("Foto procesada correctamente");
-        };
-    }
-    catch(err){
-        console.error("ERROR EN capturar():", err);
-        toast("No se pudo abrir la cámara.");
-    }
-}
-
-// ================================
-// PREPROCESAR → 320x320
-// ================================
-async function preprocessImage(img){
-    const size = 320;
-    const c = document.createElement("canvas");
-    const ctx = c.getContext("2d");
-    c.width = size;
-    c.height = size;
-
-    ctx.drawImage(img, 0, 0, size, size);
-
-    const { data } = ctx.getImageData(0, 0, size, size);
-    const input = new Float32Array(size*size*3);
-
-    let j=0;
-    for(let i=0; i<data.length; i+=4){
-        input[j++] = data[i] /255;
-        input[j++] = data[i+1]/255;
-        input[j++] = data[i+2]/255;
-    }
-
-    return new ort.Tensor("float32", input, [1,3,size,size]);
-}
-
-// ================================
-// APLICAR MÁSCARA
-// ================================
-function applyMaskToImage(originalCanvas, maskTensor) {
-    const maskData = maskTensor.data; // Float32Array (1,1,320,320)
-    const w = originalCanvas.width;
-    const h = originalCanvas.height;
-
-    // Canvas resultado
-    const result = document.createElement("canvas");
-    result.width = w;
-    result.height = h;
-    const rctx = result.getContext("2d");
-
-    // Dibujamos la imagen original
-    rctx.drawImage(originalCanvas, 0, 0);
-    const imgData = rctx.getImageData(0, 0, w, h);
-    const d = imgData.data;
-
-    // 1) Construimos la máscara 320x320 en escala de grises
-    const maskCanvas = document.createElement("canvas");
-    maskCanvas.width = 320;
-    maskCanvas.height = 320;
-    const mctx = maskCanvas.getContext("2d");
-    const maskImg = mctx.createImageData(320, 320);
-
-    for (let i = 0; i < maskData.length; i++) {
-        // El modelo suele devolver valores [0,1] o cercanos
-        let v = Math.max(0, Math.min(1, maskData[i])) * 255;
-        maskImg.data[i * 4]     = v;
-        maskImg.data[i * 4 + 1] = v;
-        maskImg.data[i * 4 + 2] = v;
-        maskImg.data[i * 4 + 3] = 255;
-    }
-    mctx.putImageData(maskImg, 0, 0);
-
-    // 2) Escalamos la máscara al tamaño original de la foto
-    const scaled = document.createElement("canvas");
-    scaled.width = w;
-    scaled.height = h;
-    const sctx = scaled.getContext("2d");
-    sctx.drawImage(maskCanvas, 0, 0, 320, 320, 0, 0, w, h);
-    const finalMask = sctx.getImageData(0, 0, w, h).data;
-
-    // 3) Aplicamos la máscara:
-    //    - Si la máscara < UMBRAL → pixel = blanco
-    //    - Si la máscara ≥ UMBRAL → se deja el pixel original
-    const THRESHOLD = 0.5; // puedes probar 0.4 o 0.6
-
-    for (let i = 0; i < d.length; i += 4) {
-        const m = finalMask[i] / 255;  // 0 a 1
-
-        if (m < THRESHOLD) {
-            // Fondo: blanco
-            d[i]     = 255; // R
-            d[i + 1] = 255; // G
-            d[i + 2] = 255; // B
-            d[i + 3] = 255; // A
-        } else {
-            // Persona: dejamos la info original (ya está en d)
-            d[i + 3] = 255;
-        }
-    }
-
-    rctx.putImageData(imgData, 0, 0);
-    return result;
-}
-
-// ================================
-// PROCESAR IMAGEN
-// ================================
-async function procesarImagen(canvasOriginal){
-    console.log("Procesando imagen…");
-
-    const tensor = await preprocessImage(canvasOriginal);
-    const feeds = { "input.1": tensor };
-    const results = await session.run(feeds);
-
-    const mask = results[Object.keys(results)[0]];
-
-    console.log("Máscara generada:", mask);
-
-    const resultCanvas = applyMaskToImage(canvasOriginal, mask);
-
-    const preview = document.getElementById("preview");
-    preview.src = resultCanvas.toDataURL("image/png");
+    preview.src = fotoFinalBase64;
     preview.style.display = "block";
+
+    stopCamera();
 }
 
-// ================================
-// ENVIAR WHATSAPP
-// ================================
-function enviarWhatsApp(){
-    const msg = `
-Solicitud Licencia
-Nombre: ${nombre.value}
-CURP: ${curp.value}
-    `;
-    window.location.href =
-        "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
+// ⬇️ Subir imagen a Railway
+async function subirFoto(base64){
+    try {
+        const res = await fetch("/api/upload", {
+            method: "POST",
+            headers: { "Content-Type":"application/json" },
+            body: JSON.stringify({ imagen: base64 })
+        });
+
+        const data = await res.json();
+        fotoURLServidor = data.url;
+        toast("Foto guardada correctamente");
+    } catch(e){
+        console.error(e);
+        toast("Error al subir foto");
+    }
 }
+
+// ⬇️ Apagar cámara
+function stopCamera(){
+    if(stream){
+        stream.getTracks().forEach(t => t.stop());
+    }
+}
+
+// ⬇️ Enviar WhatsApp con todo el formulario
+function enviarWhatsApp(){
+    if(!fotoURLServidor){
+        toast("Primero captura tu foto");
+        return;
+    }
+
+    const tel = telefono.value;
+    const lic = licencia.value;
+    const vig = vigencia.value;
+    const nom = nombre.value;
+    const c = curp.value;
+    const em = emergencia.value;
+    const dir = direccion.value;
+
+    const msg = `
+*SOLICITUD LICENCIA DE CONDUCIR*
+
+📸 Foto: ${fotoURLServidor}
+
+📱 Teléfono: ${tel}
+🪪 Tipo de licencia: ${lic}
+⏳ Vigencia: ${vig}
+👤 Nombre: ${nom}
+🔤 CURP: ${c}
+⚠️ Emergencia: ${em}
+🏠 Dirección:
+${dir}
+`;
+
+    window.location.href =
+      "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
+}
+
+// ⬇️ Loader
+function showLoader(){ document.getElementById("loader").style.display="flex"; }
+function hideLoader(){ document.getElementById("loader").style.display="none"; }
+
+// ⬇️ Mensajes flotantes
+function toast(msg){
+    const t = document.createElement("div");
+    t.className = "toast";
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(()=>{ t.remove(); },3000);
+}
+
 </script>
 
 </body>

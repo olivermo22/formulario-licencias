@@ -1,65 +1,49 @@
 import express from "express";
-import cors from "cors";
 import fs from "fs";
 import path from "path";
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: "40mb" }));
+app.use(express.json({limit:"20mb"}));
+app.use(express.static("public"));
+app.use("/uploads", express.static("uploads"));
 
-const ROOT = process.cwd();
-const UPLOADS = path.join(ROOT, "uploads");
-const PUBLIC = path.join(ROOT, "public");
+const UPLOAD_DIR = "./uploads";
+if(!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 
-if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS);
-
-app.use("/uploads", express.static(UPLOADS));
-app.use("/", express.static(PUBLIC));
-
-// =====================================
-//  ENDPOINT para guardar fotos
-// =====================================
-app.post("/api/upload", (req, res) => {
+// ⬇️ Guardar imagen base64
+app.post("/api/upload", (req,res)=>{
     try {
-        const { imageBase64 } = req.body;
+        const base64 = req.body.imagen.replace(/^data:image\/\w+;base64,/,"");
+        const buffer = Buffer.from(base64,"base64");
 
-        if (!imageBase64) return res.status(400).json({ error: "No image received" });
-
-        const data = imageBase64.replace(/^data:image\/png;base64,/, "");
-        const buffer = Buffer.from(data, "base64");
-
-        const filename = `foto_${Date.now()}.png`;
-        const filepath = path.join(UPLOADS, filename);
+        const filename = "foto_"+Date.now()+".jpg";
+        const filepath = path.join(UPLOAD_DIR, filename);
 
         fs.writeFileSync(filepath, buffer);
 
-        const url = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
-        res.json({ url });
-
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Server error" });
+        const fullURL = `${req.protocol}://${req.get("host")}/uploads/${filename}`;
+        res.json({url: fullURL});
+    } catch(e){
+        console.error(e);
+        res.status(500).json({error:"error guardando"});
     }
 });
 
-// ================================================
-// LIMPIEZA AUTOMÁTICA — BORRAR ARCHIVOS > 15 DÍAS
-// ================================================
-setInterval(() => {
-    const files = fs.readdirSync(UPLOADS);
+// ⬇️ Limpieza automática cada hora
+setInterval(()=>{
+    const files = fs.readdirSync(UPLOAD_DIR);
     const now = Date.now();
 
-    files.forEach(file => {
-        const full = path.join(UPLOADS, file);
-        const age = (now - fs.statSync(full).mtimeMs) / (1000 * 60 * 60 * 24);
+    for(const f of files){
+        const fp = path.join(UPLOAD_DIR,f);
+        const stats = fs.statSync(fp);
+        const age = now - stats.mtimeMs;
 
-        if (age >= 15) {
-            fs.unlinkSync(full);
-            console.log("🗑 Eliminado:", file);
+        if(age > 15*24*60*60*1000){ // 15 días
+            fs.unlinkSync(fp);
         }
-    });
-}, 1000 * 60 * 60 * 24); // cada 24 h
+    }
+}, 3600000);
 
-// INICIAR SERVER
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Servidor activo en", PORT));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, ()=> console.log("Servidor activo en", PORT));
