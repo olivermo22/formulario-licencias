@@ -9,13 +9,14 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Carpeta uploads
+// Crear carpeta uploads si no existe
 const uploadDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 app.use(express.static(__dirname));
 app.use("/uploads", express.static(uploadDir));
 
+// Multer config
 const storage = multer.diskStorage({
   destination: (_, __, cb) => cb(null, uploadDir),
   filename: (_, file, cb) => {
@@ -26,17 +27,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Subir foto
 app.post("/upload", upload.single("foto"), (req, res) => {
   const fileUrl = `/uploads/${req.file.filename}`;
-  const fullURL = `${process.env.RAILWAY_PUBLIC_DOMAIN || ""}${fileUrl}`;
+  const absoluteUrl = `${process.env.RAILWAY_PUBLIC_DOMAIN || ""}${fileUrl}`;
 
   res.json({
     success: true,
-    url: fullURL
+    url: absoluteUrl
   });
 });
 
-// Listar uploads
+// Listar fotos
 app.get("/list-uploads", (req, res) => {
     fs.readdir(uploadDir, (err, files) => {
         if (err) return res.json({ files: [] });
@@ -50,12 +52,14 @@ app.get("/list-uploads", (req, res) => {
     });
 });
 
-// Eliminar
+// Eliminar foto
 app.post("/delete-upload", express.json(), (req, res) => {
     const { name } = req.body;
+
     if (!name) return res.json({ success: false });
 
     const filePath = path.join(uploadDir, name);
+
     fs.unlink(filePath, err => {
         if (err) return res.json({ success: false });
         res.json({ success: true });

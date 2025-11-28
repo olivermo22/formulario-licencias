@@ -6,17 +6,13 @@ html, body {
     margin: 0;
     padding: 0;
     font-family: "Inter", Arial, sans-serif;
-    background: #e5ddd5; /* color de fondo tipo WhatsApp chat */
+    background: #e5ddd5;
     -webkit-text-size-adjust: 100%;
 }
 
 * {
     box-sizing: border-box;
 }
-
-/* ============================
-   CONTENEDOR PRINCIPAL
-============================ */
 
 .form-wrapper {
     width: 100%;
@@ -29,21 +25,13 @@ html, body {
     border: 1px solid #dedede;
 }
 
-/* ============================
-   TÍTULO
-============================ */
-
 h1 {
     text-align: center;
     font-size: 22px;
     font-weight: 800;
     margin-bottom: 20px;
-    color: #075e54; /* verde WhatsApp */
+    color: #075e54;
 }
-
-/* ============================
-   LABELS
-============================ */
 
 label {
     font-size: 15px;
@@ -53,15 +41,11 @@ label {
     color: #303030;
 }
 
-/* ============================
-   INPUT BURBUJA
-============================ */
-
 .input,
 select {
     width: 100%;
     padding: 16px;
-    border-radius: 22px; /* formato burbuja moderno */
+    border-radius: 22px;
     border: 1.8px solid #d1d1d1;
     background: #ffffff;
     font-size: 16px;
@@ -71,14 +55,10 @@ select {
 
 .input:focus,
 select:focus {
-    border-color: #25d366; /* verde WhatsApp */
+    border-color: #25d366;
     box-shadow: 0 0 0 3px rgba(37,211,102,0.20);
     outline: none;
 }
-
-/* ============================
-   BOTÓN BURBUJA
-============================ */
 
 .btn-submit {
     margin-top: 26px;
@@ -94,29 +74,17 @@ select:focus {
     box-shadow: 0 3px 8px rgba(37,211,102,0.35);
 }
 
-.btn-submit:hover {
-    background: #1ebe5d;
-}
-
 .btn-camera {
     width: 100%;
     padding: 14px;
     border-radius: 26px;
     border: none;
     font-size: 17px;
-    background: #34b7f1; /* azul WhatsApp */
+    background: #34b7f1;
     color: white;
     margin-bottom: 12px;
     box-shadow: 0 3px 8px rgba(52,183,241,0.35);
 }
-
-.btn-camera:hover {
-    background: #0a9cdc;
-}
-
-/* ============================
-   PREVIEW FOTO BURBUJA
-============================ */
 
 .photo-preview img {
     width: 100%;
@@ -124,10 +92,6 @@ select:focus {
     margin-top: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
 }
-
-/* ============================
-   MODAL DE CÁMARA
-============================ */
 
 .camera-modal {
     display: none;
@@ -157,10 +121,6 @@ select:focus {
     pointer-events: none;
 }
 
-/* ============================
-   MODAL BOTONES
-============================ */
-
 .btn-capture,
 .btn-close {
     width: 90%;
@@ -184,10 +144,6 @@ select:focus {
     background: #ff4444;
     color: #fff;
 }
-
-/* ============================
-   PREVIEW FOTO MODAL
-============================ */
 
 .preview-area {
     display: none;
@@ -246,10 +202,6 @@ select:focus {
     color: #fff;
 }
 
-/* ============================
-   PANEL ADMIN (SECRETO)
-============================ */
-
 .admin-panel {
     background: #fafafa;
     border: 2px solid #e1e1e1;
@@ -284,12 +236,3 @@ select:focus {
     font-weight: 700;
     font-size: 15px;
 }
-
-.photo-check {
-    font-size: 60px;
-    color: #25d366;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 10px;
-}
-

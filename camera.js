@@ -1,14 +1,9 @@
 let stream;
 let capturedBlob = null;
 
-/* -----------------------------------
-   ABRIR CÁMARA
------------------------------------ */
 function openCamera() {
     document.getElementById("camera-modal").style.display = "block";
     document.getElementById("preview-area").style.display = "none";
-
-    document.getElementById("overlay").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(s => {
@@ -18,21 +13,14 @@ function openCamera() {
         .catch(() => alert("No se pudo acceder a la cámara."));
 }
 
-/* -----------------------------------
-   CERRAR CÁMARA
------------------------------------ */
 function closeCamera() {
     document.getElementById("camera-modal").style.display = "none";
-
     if (stream) {
         stream.getTracks().forEach(t => t.stop());
         stream = null;
     }
 }
 
-/* -----------------------------------
-   CAPTURAR FOTO
------------------------------------ */
 function capture() {
     const video = document.getElementById("camera");
     const canvas = document.createElement("canvas");
@@ -54,12 +42,10 @@ function capture() {
         document.getElementById("btn-close").style.display = "none";
 
         document.getElementById("preview-area").style.display = "flex";
+
     }, "image/png");
 }
 
-/* -----------------------------------
-   RETOMAR
------------------------------------ */
 function retakePhoto() {
     document.getElementById("preview-area").style.display = "none";
 
@@ -69,17 +55,11 @@ function retakePhoto() {
     document.getElementById("btn-close").style.display = "block";
 }
 
-/* -----------------------------------
-   CANCELAR
------------------------------------ */
 function cancelPhoto() {
     capturedBlob = null;
     closeCamera();
 }
 
-/* -----------------------------------
-   ACEPTAR FOTO (SUBIR)
------------------------------------ */
 async function acceptPhoto() {
     if (!capturedBlob) {
         alert("No hay foto capturada.");
@@ -104,15 +84,6 @@ async function acceptPhoto() {
     document.getElementById("foto_url").value = data.url;
 
     document.getElementById("photo-preview").style.display = "block";
-
-    document.getElementById("final-photo").onerror = () => {
-        document.getElementById("final-photo").style.display = "none";
-    };
-
-    document.getElementById("final-photo").onload = () => {
-        document.getElementById("final-photo").style.display = "block";
-    };
-
     document.getElementById("final-photo").src = data.url;
 
     closeCamera();
