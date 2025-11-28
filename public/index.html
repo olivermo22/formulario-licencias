@@ -122,6 +122,7 @@
 
 let stream;
 let imagenBase64 = "";
+let linkFotoServidor = "";
 
 /* ========== ABRIR MODAL ========== */
 function abrirModal() {
@@ -182,11 +183,25 @@ function repetirFoto() {
 }
 
 /* ========== CONFIRMAR FOTO ========== */
-function confirmarFoto() {
+async function confirmarFoto() {
+
     cerrarModalCam();
 
+    // Mostrar preview en el formulario
     document.getElementById("previewFinal").src = imagenBase64;
     document.getElementById("previewFinal").style.display = "block";
+
+    // Subir foto al servidor
+    showLoader();
+    const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ foto: imagenBase64 })
+    });
+    hideLoader();
+
+    const data = await res.json();
+    linkFotoServidor = data.url;   // <--- Guardamos link público
 
     toast("Foto guardada correctamente");
 }
@@ -194,7 +209,9 @@ function confirmarFoto() {
 /* ========== ENVIAR WHATSAPP ========== */
 function enviarWhatsApp(){
 
-    if(!imagenBase64){
+ function enviarWhatsApp(){
+
+    if (!linkFotoServidor) {
         toast("Primero toma la foto");
         return;
     }
@@ -202,7 +219,7 @@ function enviarWhatsApp(){
     const msg = `
 *SOLICITUD LICENCIA DE CONDUCIR*
 
-📸 Foto lista
+📸 Foto: ${linkFotoServidor}
 
 📱 Teléfono: ${telefono.value}
 🪪 Tipo licencia: ${licencia.value}
@@ -214,7 +231,8 @@ function enviarWhatsApp(){
 ${direccion.value}
 `;
 
-    window.location.href = "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
+    window.location.href =
+      "https://wa.me/527225600905?text=" + encodeURIComponent(msg);
 }
 
 /* ========== TOAST ========== */
