@@ -134,6 +134,15 @@
 
 <!-- MODAL DE CÁMARA -->
 <div id="camera-modal" class="camera-modal">
+    <div id="preview-area" class="preview-area" style="display:none;">
+    <img id="preview-photo" class="preview-photo">
+    <div class="preview-buttons">
+        <button class="btn-accept" onclick="acceptPhoto()">Usar esta foto</button>
+        <button class="btn-retake" onclick="retakePhoto()">Tomar otra</button>
+        <button class="btn-cancel" onclick="cancelPhoto()">Cancelar</button>
+    </div>
+</div>
+
     <video id="camera" autoplay></video>
     <img id="overlay" src="public/silhouette.png">
     <button id="btn-capture" class="btn-capture" onclick="capture()">Capturar</button>

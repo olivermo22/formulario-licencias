@@ -141,3 +141,55 @@ label {
     border-radius: 6px;
     cursor: pointer;
 }
+
+.preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    padding: 20px;
+}
+
+.preview-photo {
+    width: 90%;
+    max-width: 380px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.preview-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 90%;
+}
+
+.btn-accept {
+    background: #25d366;
+    padding: 14px;
+    border-radius: 6px;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+}
+
+.btn-retake {
+    background: #0a7cff;
+    padding: 14px;
+    border-radius: 6px;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+}
+
+.btn-cancel {
+    background: #ff4444;
+    padding: 14px;
+    border-radius: 6px;
+    color: #fff;
+    border: none;
+    font-size: 18px;
+}
