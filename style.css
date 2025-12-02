@@ -1,141 +1,249 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
+/* ============================
+   RESETEO GENERAL
+============================ */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
+body {
+    background: #f2f2f2;
+    padding: 20px;
+}
+
+/* ============================
+   FORMULARIO PRINCIPAL
+============================ */
 .form-wrapper {
+    width: 100%;
     max-width: 420px;
     margin: auto;
-    padding: 20px;
     background: white;
-    border-radius: 12px;
+    padding: 22px;
+    border-radius: 20px;
+    box-shadow: 0px 5px 18px rgba(0,0,0,0.15);
+}
+
+h1 {
+    font-size: 22px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #111;
 }
 
 label {
+    margin-top: 14px;
     display: block;
-    margin-top: 10px;
+    font-weight: 600;
+    color: #333;
 }
 
-input, select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    margin-top: 5px;
-}
-
-button {
+/* Inputs */
+.input {
     width: 100%;
     padding: 14px;
-    margin-top: 15px;
-    border: none;
     border-radius: 12px;
-    background: #25d366;
-    color: white;
-    font-size: 17px;
-    cursor: pointer;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    margin-top: 6px;
+    background: #fff;
+}
+
+.input:focus {
+    border-color: #25d366;
+    outline: none;
+}
+
+/* ============================
+   BOTONES PRINCIPALES
+============================ */
+button {
+    transition: transform 0.12s ease, opacity 0.12s ease;
 }
 
 button:active {
-    transform: scale(0.96);
-    opacity: 0.8;
+    transform: scale(0.95);
+    opacity: 0.85;
 }
 
-.photo-preview img, #signature-preview img {
+/* Botón de cámara */
+.btn-camera {
     width: 100%;
+    padding: 14px;
+    background: #0095f6;
+    color: white;
+    border: none;
+    margin-top: 8px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Botón enviar */
+.btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: #25d366;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    margin-top: 25px;
+    font-weight: bold;
+}
+
+/* ============================
+   PREVIEW FOTO
+============================ */
+.photo-preview {
+    margin-top: 12px;
+    padding: 10px;
+    background: #e9fbea;
+    border-left: 4px solid #25d366;
+    border-radius: 8px;
+}
+
+.photo-preview img {
+    width: 100%;
+    margin-top: 6px;
     border-radius: 12px;
 }
 
 /* ============================
-   MODAL SIMPLE
+   SECCIONES
+============================ */
+.section-title {
+    font-size: 18px;
+    margin-top: 25px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* ============================
+   MODAL DE CÁMARA/FIRMA
 ============================ */
 .camera-modal {
+    display: none;
     position: fixed;
     inset: 0;
-    background: #000;
-    display: none;
-    z-index: 9999;
+    background: rgba(0,0,0,0.88);
+    z-index: 99999;
+    padding-top: 20px;
+    text-align: center;
 }
 
+/* Video */
 #camera {
-    width: 100%;
-    height: auto;
-    margin-top: 40px;
+    width: 82%;
+    border-radius: 16px;
+    margin-top: 25px;
 }
 
-.overlay {
-    position: absolute;
-    top: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%;
-    opacity: 0.35;
-}
-
-#btn-capture, #btn-close {
+/* Silueta */
+#overlay {
     position: fixed;
-    bottom: 40px;
-    width: 160px;
+    top: 80px;
     left: 50%;
     transform: translateX(-50%);
+    width: 60%;
+    opacity: 0.55;
+    pointer-events: none;
 }
 
-#btn-close {
-    bottom: 100px;
+/* Botones dentro del modal */
+.btn-capture {
+    margin-top: 25px;
+    padding: 14px 28px;
+    background: #25d366;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn-close {
+    margin-top: 18px;
+    padding: 10px 22px;
     background: #ff3b30;
+    color: white;
+    border-radius: 50px;
+    border: none;
+    font-size: 16px;
 }
 
+/* ============================
+   PREVIEW DESPUÉS DE CAPTURAR
+============================ */
 .preview-area {
-    position: fixed;
-    inset: 0;
-    background: #000;
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    margin-top: 20px;
 }
 
-.preview-area img {
-    width: 90%;
-    border-radius: 10px;
+.preview-photo {
+    width: 80%;
+    border-radius: 16px;
+    margin-bottom: 18px;
+}
+
+.preview-buttons button {
+    display: block;
+    width: 80%;
+    margin: 8px auto;
+    padding: 12px;
+    border-radius: 40px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
 }
 
 .btn-accept {
     background: #25d366;
+    color: white;
 }
+
 .btn-retake {
-    background: #ffcd03;
+    background: #0095f6;
+    color: white;
 }
+
 .btn-cancel {
     background: #ff3b30;
+    color: white;
 }
 
 /* ============================
-   FIRMA
+   FIRMA DIGITAL
 ============================ */
-#signature-modal {
-    position: fixed;
-    inset: 0;
-    background: #000c;
+#signature-canvas {
+    width: 85%;
+    height: 260px;
+    background: white;
+    border-radius: 12px;
+    margin: 12px auto;
+    border: 2px solid #ccc;
 }
 
-#signature-canvas {
-    width: 90%;
-    height: 300px;
-    margin: 20px auto;
-    background: white;
+.signature-instruction {
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    margin-top: 40px;
+    font-weight: 600;
 }
 
 /* ============================
-   LOADER
+   LOADER GLOBAL
 ============================ */
 .loader-overlay {
     position: fixed;
     inset: 0;
-    display: none;
-    background: rgba(0,0,0,0.7);
-    z-index: 99999;
+    background: rgba(0,0,0,0.75);
+    z-index: 999999;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
@@ -143,17 +251,61 @@ button:active {
 .loader-box {
     text-align: center;
     color: white;
+    font-size: 18px;
 }
 
 .spinner {
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(255,255,255,0.3);
+    width: 55px;
+    height: 55px;
+    border: 6px solid rgba(255,255,255,0.3);
     border-top-color: #25d366;
     border-radius: 50%;
-    animation: spin .8s linear infinite;
+    margin: 0 auto 20px;
+    animation: spinner 0.9s linear infinite;
 }
 
-@keyframes spin {
+@keyframes spinner {
     to { transform: rotate(360deg); }
+}
+
+/* ============================
+   PANEL ADMIN SECRETO
+============================ */
+.admin-panel {
+    margin-top: 20px;
+    padding: 15px;
+    background: #222;
+    color: white;
+    border-radius: 10px;
+}
+
+.file-entry {
+    display: flex;
+    align-items: center;
+    background: #333;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.thumb {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 12px;
+}
+
+.info p {
+    color: #ddd;
+}
+
+.delete-btn {
+    margin-left: auto;
+    background: #ff3b30;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
 }

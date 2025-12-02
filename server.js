@@ -9,35 +9,62 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Asegurar carpeta
-const uploadDir = path.join(__dirname, "uploads");
+// Crear carpeta uploads si no existe
+const uploadDir = path.join(__dirname, "uploEads");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 app.use(express.static(__dirname));
 app.use("/uploads", express.static(uploadDir));
 
+// Multer config
 const storage = multer.diskStorage({
-    destination: (_, __, cb) => cb(null, uploadDir),
-    filename: (_, file, cb) => {
-        const name = Date.now() + "_" + file.originalname.replace(/\s+/g, "_");
-        cb(null, name);
-    }
+  destination: (_, __, cb) => cb(null, uploadDir),
+  filename: (_, file, cb) => {
+    const name = Date.now() + "_" + file.originalname;
+    cb(null, name);
+  }
 });
 
 const upload = multer({ storage });
 
-// Subida
+// Subir foto
 app.post("/upload", upload.single("foto"), (req, res) => {
-    if (!req.file) return res.json({ success: false });
+  const fileUrl = `/uploads/${req.file.filename}`;
+  const absoluteUrl = `${process.env.RAILWAY_PUBLIC_DOMAIN || ""}${fileUrl}`;
 
-    const url = `/uploads/${req.file.filename}`;
-    const full = process.env.RAILWAY_PUBLIC_DOMAIN
-        ? process.env.RAILWAY_PUBLIC_DOMAIN + url
-        : url;
-
-    res.json({ success: true, url: full });
+  res.json({
+    success: true,
+    url: absoluteUrl
+  });
 });
 
-app.listen(process.env.PORT || 3000, () =>
-    console.log("Servidor corriendo")
-);
+// Listar fotos
+app.get("/list-uploads", (req, res) => {
+    fs.readdir(uploadDir, (err, files) => {
+        if (err) return res.json({ files: [] });
+
+        const details = files.map(name => {
+            const stats = fs.statSync(path.join(uploadDir, name));
+            return { name, size: stats.size };
+        });
+
+        res.json({ files: details });
+    });
+});
+
+// Eliminar foto
+app.post("/delete-upload", express.json(), (req, res) => {
+    const { name } = req.body;
+
+    if (!name) return res.json({ success: false });
+
+    const filePath = path.join(uploadDir, name);
+
+    fs.unlink(filePath, err => {
+        if (err) return res.json({ success: false });
+        res.json({ success: true });
+    });
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log("Servidor funcionando en puerto " + port));

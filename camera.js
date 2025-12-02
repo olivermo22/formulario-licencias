@@ -1,41 +1,45 @@
-/* ============================================================
-   VARIABLES GLOBALES
-============================================================ */
-let stream = null;
+// =======================================================
+// VARIABLES GLOBALES
+// =======================================================
+let stream;
 let capturedBlob = null;
 let captureMode = "rostro"; // "rostro" o "documento"
 
-/* ============================================================
-   LOADER
-============================================================ */
+// =======================================================
+// LOADER
+// =======================================================
 function showLoader() {
     document.getElementById("loader").style.display = "flex";
 }
+
 function hideLoader() {
     document.getElementById("loader").style.display = "none";
 }
 
-/* ============================================================
-   RESET UI
-============================================================ */
+// =======================================================
+// RESET DE UI DE CÁMARA
+// =======================================================
 function resetCameraUI() {
-    // Estos elementos SÍ existen en la versión A
     document.getElementById("preview-area").style.display = "none";
     document.getElementById("camera").style.display = "block";
     document.getElementById("btn-capture").style.display = "block";
     document.getElementById("btn-close").style.display = "block";
 
+    // Mostrar silueta solo en modo rostro
     if (captureMode === "rostro") {
         document.getElementById("overlay").src = "silhouette.png";
         document.getElementById("overlay").style.display = "block";
-    } else {
+    }
+
+    // Ocultar silueta en modo documento
+    if (captureMode === "documento") {
         document.getElementById("overlay").style.display = "none";
     }
 }
 
-/* ============================================================
-   ABRIR CÁMARA ROSTRO
-============================================================ */
+// =======================================================
+// ABRIR CÁMARA - FOTO DEL TITULAR
+// =======================================================
 function openCamera() {
     captureMode = "rostro";
     capturedBlob = null;
@@ -43,22 +47,17 @@ function openCamera() {
 
     document.getElementById("camera-modal").style.display = "block";
 
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" }
-    })
-    .then(s => {
-        stream = s;
-        document.getElementById("camera").srcObject = s;
-    })
-    .catch(err => {
-        console.error(err);
-        alert("No se pudo acceder a la cámara frontal.");
-    });
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(s => {
+            stream = s;
+            document.getElementById("camera").srcObject = s;
+        })
+        .catch(() => alert("No se pudo acceder a la cámara."));
 }
 
-/* ============================================================
-   ABRIR CÁMARA DOCUMENTO
-============================================================ */
+// =======================================================
+// ABRIR CÁMARA - FOTO DEL DOCUMENTO
+// =======================================================
 function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
@@ -74,16 +73,15 @@ function openCameraDoc() {
         stream = s;
         document.getElementById("camera").srcObject = s;
     })
-    .catch(err => {
-        console.error(err);
-        alert("No se pudo usar la cámara trasera. Intentando cámara frontal.");
+    .catch(() => {
+        alert("No se pudo usar la cámara trasera, usando cámara frontal.");
         openCamera();
     });
 }
 
-/* ============================================================
-   CAPTURAR FOTO
-============================================================ */
+// =======================================================
+// CAPTURAR FOTO
+// =======================================================
 function capture() {
     const video = document.getElementById("camera");
     const canvas = document.createElement("canvas");
@@ -99,83 +97,105 @@ function capture() {
 
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
 
-        // Ocultar elementos
+        // Ocultar UI de cámara
         document.getElementById("camera").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("btn-capture").style.display = "none";
         document.getElementById("btn-close").style.display = "none";
 
+        // Mostrar preview
         document.getElementById("preview-area").style.display = "flex";
-    }, "image/jpeg", 0.92);
+
+    }, "image/png");
 }
 
-/* ============================================================
-   ACEPTAR FOTO (SUBE AL SERVIDOR)
-============================================================ */
+// =======================================================
+// ACEPTAR FOTO → SUBIR + ASIGNAR
+// =======================================================
 async function acceptPhoto() {
-    if (!capturedBlob) return alert("No hay foto capturada.");
+
+    if (!capturedBlob) {
+        alert("No hay foto capturada.");
+        return;
+    }
 
     showLoader();
 
     try {
-        const fd = new FormData();
-        const fileName = captureMode === "rostro" ? "rostro.jpg" : "documento.jpg";
-        fd.append("foto", capturedBlob, fileName);
+        const formData = new FormData();
+        const fileName = captureMode === "rostro"
+            ? "rostro.png"
+            : "documento.png";
 
-        const res = await fetch("/upload", { method: "POST", body: fd });
-        const data = await res.json();
+        formData.append("foto", capturedBlob, fileName);
 
-        if (!data.success) return alert("Error subiendo imagen");
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert("Error al subir la imagen.");
+            return;
+        }
 
         if (captureMode === "rostro") {
             document.getElementById("foto_url").value = data.url;
             document.getElementById("photo-preview").style.display = "block";
             document.getElementById("final-photo").src = data.url;
-        } else {
+        }
+
+        if (captureMode === "documento") {
             document.getElementById("foto_documento_url").value = data.url;
             document.getElementById("photo-preview-doc").style.display = "block";
             document.getElementById("final-photo-doc").src = data.url;
         }
 
         closeCamera();
-    } catch (err) {
-        console.error(err);
+
+    } catch (error) {
+        console.error("Error al aceptar la foto:", error);
+        alert("Ocurrió un problema subiendo la imagen.");
+
     } finally {
         hideLoader();
     }
 }
 
-/* ============================================================
-   REHACER FOTO
-============================================================ */
+// =======================================================
+// REHACER FOTO
+// =======================================================
 function retakePhoto() {
     capturedBlob = null;
     resetCameraUI();
 }
 
-/* ============================================================
-   CANCELAR
-============================================================ */
+// =======================================================
+// CANCELAR FOTO
+// =======================================================
 function cancelPhoto() {
     capturedBlob = null;
     closeCamera();
 }
 
-/* ============================================================
-   CERRAR CÁMARA
-============================================================ */
+// =======================================================
+// CERRAR CÁMARA COMPLETAMENTE
+// =======================================================
 function closeCamera() {
     if (stream) {
         stream.getTracks().forEach(t => t.stop());
         stream = null;
     }
+
     resetCameraUI();
     document.getElementById("camera-modal").style.display = "none";
 }
 
-/* ============================================================
-   FIRMA DIGITAL
-============================================================ */
+// =======================================================
+// FIRMA DIGITAL
+// =======================================================
 let sigCanvas, sigCtx;
 let drawing = false;
 let lastX = 0;
@@ -183,6 +203,7 @@ let lastY = 0;
 
 function openSignature() {
     document.getElementById("signature-modal").style.display = "block";
+    document.getElementById("signature-instruction").style.display = "block";
 
     sigCanvas = document.getElementById("signature-canvas");
     sigCtx = sigCanvas.getContext("2d");
@@ -190,16 +211,17 @@ function openSignature() {
     sigCanvas.width = sigCanvas.offsetWidth;
     sigCanvas.height = sigCanvas.offsetHeight;
 
-    sigCtx.fillStyle = "#fff";
+    sigCtx.fillStyle = "#ffffff";
     sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
 
-    sigCanvas.addEventListener("touchstart", startDraw);
-    sigCanvas.addEventListener("touchmove", drawTouch);
-    sigCanvas.addEventListener("touchend", stopDraw);
-
-    sigCanvas.addEventListener("mousedown", startDraw);
-    sigCanvas.addEventListener("mousemove", drawMouse);
-    sigCanvas.addEventListener("mouseup", stopDraw);
+    sigCanvas.addEventListener("touchstart", startDraw, false);
+    sigCanvas.addEventListener("touchmove", drawTouch, false);
+    sigCanvas.addEventListener("touchend", stopDraw, false);
+    
+    sigCanvas.addEventListener("mousedown", startDraw, false);
+    sigCanvas.addEventListener("mousemove", drawMouse, false);
+    sigCanvas.addEventListener("mouseup", stopDraw, false);
+    sigCanvas.addEventListener("mouseout", stopDraw, false);
 }
 
 function startDraw(e) {
@@ -208,6 +230,7 @@ function startDraw(e) {
     lastX = pos.x;
     lastY = pos.y;
 }
+
 function drawMouse(e) {
     if (!drawing) return;
     drawLine(e.offsetX, e.offsetY);
@@ -221,7 +244,7 @@ function drawTouch(e) {
 }
 
 function drawLine(x, y) {
-    sigCtx.strokeStyle = "#000";
+    sigCtx.strokeStyle = "#000000";
     sigCtx.lineWidth = 3;
     sigCtx.lineCap = "round";
 
@@ -239,47 +262,62 @@ function stopDraw() {
 }
 
 function getPos(e) {
-    const rect = sigCanvas.getBoundingClientRect();
+    let rect = sigCanvas.getBoundingClientRect();
     if (e.touches) {
-        return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
     }
     return { x: e.offsetX, y: e.offsetY };
 }
 
 function clearSignature() {
-    sigCtx.fillStyle = "#fff";
+    sigCtx.fillStyle = "#ffffff";
     sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
 }
 
 function closeSignature() {
     document.getElementById("signature-modal").style.display = "none";
+    document.getElementById("signature-instruction").style.display = "none";
 }
 
-/* ============================================================
-   GUARDAR FIRMA
-============================================================ */
+// =======================================================
+// GUARDAR FIRMA
+// =======================================================
 async function saveSignature() {
+
     showLoader();
 
     try {
         const dataURL = sigCanvas.toDataURL("image/png");
         const blob = await (await fetch(dataURL)).blob();
 
-        const fd = new FormData();
-        fd.append("foto", blob, "firma.png");
+        const formData = new FormData();
+        formData.append("foto", blob, "firma.png");
 
-        const res = await fetch("/upload", { method: "POST", body: fd });
-        const data = await res.json();
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
 
-        if (!data.success) return alert("Error subiendo firma");
+        const data = await response.json();
+
+        if (!data.success) {
+            alert("Error al subir la firma.");
+            return;
+        }
 
         document.getElementById("firma_url").value = data.url;
         document.getElementById("signature-preview").style.display = "block";
         document.getElementById("final-signature").src = data.url;
 
         closeSignature();
-    } catch (err) {
-        console.error(err);
+
+    } catch (error) {
+        console.error("Error al guardar firma:", error);
+        alert("Hubo un problema al guardar la firma.");
+
     } finally {
         hideLoader();
     }
