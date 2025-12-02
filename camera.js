@@ -44,7 +44,13 @@ function openCamera() {
 
     document.getElementById("camera-modal").style.display = "block";
 
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.mediaDevices.getUserMedia({
+    video: {
+        facingMode: "user",
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+    }
+})
         .then(s => {
             stream = s;
             document.getElementById("camera").srcObject = s;
@@ -64,7 +70,13 @@ function openCameraDoc() {
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } }
+    video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+    }
+})
+
     })
     .then(s => {
         stream = s;
@@ -104,7 +116,7 @@ function capture() {
         // Mostrar UI de preview
         document.getElementById("preview-area").style.display = "flex";
 
-    }, "image/png");
+    }, "image/jpeg",0.92);
 }
 
 // ===============================
@@ -309,4 +321,5 @@ async function saveSignature() {
         hideLoader();
     }
 }
+
 
