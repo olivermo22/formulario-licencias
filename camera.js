@@ -1,21 +1,38 @@
+// ===============================
+// VARIABLES GLOBALES
+// ===============================
 let stream;
 let capturedBlob = null;
-let captureMode = "rostro"; // "rostro" o "documento"
+let captureMode = "rostro"; // rostro | documento
 
+// ===============================
+// RESET DE UI DE CÁMARA
+// ===============================
 function resetCameraUI() {
     document.getElementById("preview-area").style.display = "none";
     document.getElementById("camera").style.display = "block";
-    document.getElementById("overlay").style.display = "block";
     document.getElementById("btn-capture").style.display = "block";
     document.getElementById("btn-close").style.display = "block";
+
+    // Restaurar overlay para rostro
+    if (captureMode === "rostro") {
+        document.getElementById("overlay").src = "silhouette.png";
+        document.getElementById("overlay").style.display = "block";
+    }
+
+    // Ocultar overlay para documento
+    if (captureMode === "documento") {
+        document.getElementById("overlay").style.display = "none";
+    }
 }
 
+// ===============================
+// ABRIR CÁMARA (ROSTRO)
+// ===============================
 function openCamera() {
     captureMode = "rostro";
+    capturedBlob = null;
     resetCameraUI();
-
-    document.getElementById("overlay").src = "silhouette.png";
-    document.getElementById("overlay").style.display = "block";
 
     document.getElementById("camera-modal").style.display = "block";
 
@@ -27,13 +44,15 @@ function openCamera() {
         .catch(() => alert("No se pudo acceder a la cámara."));
 }
 
+// ===============================
+// ABRIR CÁMARA (DOCUMENTO)
+// ===============================
 function openCameraDoc() {
     captureMode = "documento";
+    capturedBlob = null;
     resetCameraUI();
 
-    // Aquí quitamos la silueta
     document.getElementById("overlay").style.display = "none";
-
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
@@ -49,16 +68,9 @@ function openCameraDoc() {
     });
 }
 
-function closeCamera() {
-    if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-    }
-
-    resetCameraUI();
-    document.getElementById("camera-modal").style.display = "none";
-}
-
+// ===============================
+// CAPTURAR FOTO
+// ===============================
 function capture() {
     const video = document.getElementById("camera");
     const canvas = document.createElement("canvas");
@@ -72,29 +84,24 @@ function capture() {
     canvas.toBlob(blob => {
         capturedBlob = blob;
 
+        // Mostrar preview
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
 
+        // Ocultar UI de cámara
         document.getElementById("camera").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("btn-capture").style.display = "none";
         document.getElementById("btn-close").style.display = "none";
 
+        // Mostrar UI de preview
         document.getElementById("preview-area").style.display = "flex";
 
     }, "image/png");
 }
 
-function retakePhoto() {
-    resetCameraUI();
-    document.getElementById("preview-area").style.display = "none";
-}
-
-
-function cancelPhoto() {
-    capturedBlob = null;
-    closeCamera();
-}
-
+// ===============================
+// USAR ESTA FOTO
+// ===============================
 async function acceptPhoto() {
     if (!capturedBlob) {
         alert("No hay foto capturada.");
@@ -102,7 +109,8 @@ async function acceptPhoto() {
     }
 
     const formData = new FormData();
-    formData.append("foto", capturedBlob, captureMode + ".png");
+    const fileName = captureMode === "rostro" ? "rostro.png" : "documento.png";
+    formData.append("foto", capturedBlob, fileName);
 
     const response = await fetch("/upload", {
         method: "POST",
@@ -116,11 +124,14 @@ async function acceptPhoto() {
         return;
     }
 
+    // Guardar URL según tipo
     if (captureMode === "rostro") {
         document.getElementById("foto_url").value = data.url;
         document.getElementById("photo-preview").style.display = "block";
         document.getElementById("final-photo").src = data.url;
-    } else {
+    }
+
+    if (captureMode === "documento") {
         document.getElementById("foto_documento_url").value = data.url;
         document.getElementById("photo-preview-doc").style.display = "block";
         document.getElementById("final-photo-doc").src = data.url;
@@ -130,8 +141,37 @@ async function acceptPhoto() {
 }
 
 // ===============================
-//  FIRMA DIGITAL
+// REHACER FOTO
 // ===============================
+function retakePhoto() {
+    capturedBlob = null;
+    resetCameraUI();
+}
+
+// ===============================
+// CANCELAR
+// ===============================
+function cancelPhoto() {
+    capturedBlob = null;
+    closeCamera();
+}
+
+// ===============================
+// CERRAR CÁMARA CORRECTAMENTE
+// ===============================
+function closeCamera() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
+
+    resetCameraUI();
+    document.getElementById("camera-modal").style.display = "none";
+}
+
+// ==================================================
+//     FIRMA DIGITAL (SIN CAMBIOS - YA FUNCIONABA)
+// ==================================================
 let sigCanvas, sigCtx;
 let drawing = false;
 let lastX = 0;
@@ -139,18 +179,17 @@ let lastY = 0;
 
 function openSignature() {
     document.getElementById("signature-modal").style.display = "block";
+    document.getElementById("signature-instruction").style.display = "block";
 
     sigCanvas = document.getElementById("signature-canvas");
     sigCtx = sigCanvas.getContext("2d");
 
-    // Ajustar canvas a tamaño real
     sigCanvas.width = sigCanvas.offsetWidth;
     sigCanvas.height = sigCanvas.offsetHeight;
 
     sigCtx.fillStyle = "#ffffff";
     sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
 
-    // Eventos táctiles y de mouse
     sigCanvas.addEventListener("touchstart", startDraw, false);
     sigCanvas.addEventListener("touchmove", drawTouch, false);
     sigCanvas.addEventListener("touchend", stopDraw, false);
@@ -209,24 +248,21 @@ function getPos(e) {
     return { x: e.offsetX, y: e.offsetY };
 }
 
-// Limpiar firma
 function clearSignature() {
     sigCtx.fillStyle = "#ffffff";
     sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
 }
 
-// Cerrar modal
 function closeSignature() {
     document.getElementById("signature-modal").style.display = "none";
+    document.getElementById("signature-instruction").style.display = "none";
 }
 
-// Guardar firma
 async function saveSignature() {
-    const dataURL = sigCanvas.toDataURL("image/png"); // firma en PNG
+    const dataURL = sigCanvas.toDataURL("image/png");
 
     const blob = await (await fetch(dataURL)).blob();
     const formData = new FormData();
-
     formData.append("foto", blob, "firma.png");
 
     const response = await fetch("/upload", {
@@ -241,10 +277,7 @@ async function saveSignature() {
         return;
     }
 
-    // Guardar en el formulario
     document.getElementById("firma_url").value = data.url;
-
-    // Mostrar preview
     document.getElementById("signature-preview").style.display = "block";
     document.getElementById("final-signature").src = data.url;
 
