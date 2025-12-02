@@ -63,29 +63,32 @@ function openCamera() {
 /* ============================================================
    ABRIR CÁMARA PARA DOCUMENTO
 ============================================================ */
-function openCameraDoc() {
+ async function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
     resetCameraUI();
     document.getElementById("overlay").style.display = "none";
-
     document.getElementById("camera-modal").style.display = "block";
 
-    navigator.mediaDevices.getUserMedia({
-        video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-        }
-    })
-    .then(s => {
-        stream = s;
-        document.getElementById("camera").srcObject = s;
-    })
-    .catch(() => {
-        alert("No se pudo acceder a la cámara trasera. Usando frontal.");
+    try {
+        const bestCameraId = await getBestBackCamera();
+
+        const streamResult = await navigator.mediaDevices.getUserMedia({
+            video: {
+                deviceId: { exact: bestCameraId },
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        });
+
+        stream = streamResult;
+        document.getElementById("camera").srcObject = streamResult;
+
+    } catch (err) {
+        console.error(err);
+        alert("No se pudo usar la cámara trasera correcta. Se usará la frontal.");
         openCamera();
-    });
+    }
 }
 
 /* ============================================================
@@ -318,4 +321,25 @@ async function saveSignature() {
     } finally {
         hideLoader();
     }
+}
+
+async function getBestBackCamera() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+
+    const videoDevices = devices.filter(d => d.kind === "videoinput");
+
+    // Intentamos encontrar la cámara trasera por nombre
+    let backCameras = videoDevices.filter(d =>
+        d.label.toLowerCase().includes("back") ||
+        d.label.toLowerCase().includes("rear") ||
+        d.label.toLowerCase().includes("environment")
+    );
+
+    // Si encontramos varias, elegir la más probable de alta calidad
+    if (backCameras.length > 0) {
+        return backCameras[backCameras.length - 1].deviceId;
+    }
+
+    // Si no detecta, usar la última (suele ser la trasera)
+    return videoDevices[videoDevices.length - 1].deviceId;
 }
