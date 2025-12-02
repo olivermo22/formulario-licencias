@@ -7,23 +7,32 @@ let captureMode = "rostro"; // "rostro" o "documento"
 // =======================================================
 // OBTENER LA MEJOR CÁMARA DISPONIBLE (MAYOR RESOLUCIÓN)
 // =======================================================
-async function getBestCamera() {
+async function getRearCamera() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const cameras = devices.filter(d => d.kind === "videoinput");
+        const cams = devices.filter(d => d.kind === "videoinput");
 
-        if (!cameras.length) return null;
-
-        // prioridad: rear, back, environment
-        const rear = cameras.find(c =>
-            c.label.toLowerCase().includes("back") ||
-            c.label.toLowerCase().includes("rear") ||
-            c.label.toLowerCase().includes("environment")
+        // Intentar encontrar cámaras que no sean frontales
+        let rearCams = cams.filter(c =>
+            !c.label.toLowerCase().includes("front") &&
+            !c.label.toLowerCase().includes("user")
         );
 
-        return rear ? rear.deviceId : cameras[0].deviceId;
+        // Si no encontramos por label, elegir la cámara #1 (trasera típica)
+        if (rearCams.length === 0 && cams.length > 1) {
+            return cams[1].deviceId;
+        }
 
-    } catch {
+        // Si hay múltiples traseras, priorizar la de mejor etiqueta
+        if (rearCams.length >= 1) {
+            return rearCams[0].deviceId;
+        }
+
+        // Fallback
+        return cams[0].deviceId;
+
+    } catch (err) {
+        console.log("Error buscando cámara trasera:", err);
         return null;
     }
 }
@@ -90,16 +99,16 @@ async function openCameraDoc() {
     document.getElementById("camera-modal").style.display = "block";
 
     try {
-        // PRIMERA LLAMADA: pedir permiso mínimo
+        // PRIMERA LLAMADA: pedir permisos para obtener labels reales
         await navigator.mediaDevices.getUserMedia({ video: true });
 
-        // AHORA SÍ podemos leer las cámaras reales
-        const bestCamId = await getBestCamera();
+        // OBTENER ID DE CÁMARA TRASERA REAL 
+        const rearId = await getRearCamera();
 
-        const constraints = bestCamId
+        const constraints = rearId
             ? {
                 video: {
-                    deviceId: { exact: bestCamId },
+                    deviceId: { exact: rearId },
                     width: { ideal: 1920 },
                     height: { ideal: 1080 }
                 }
@@ -113,7 +122,6 @@ async function openCameraDoc() {
             };
 
         const s = await navigator.mediaDevices.getUserMedia(constraints);
-
         stream = s;
         document.getElementById("camera").srcObject = s;
 
@@ -121,13 +129,10 @@ async function openCameraDoc() {
 
     } catch (err) {
         console.log("Error usando cámara trasera:", err);
-
         alert("No se pudo acceder a la cámara trasera, usando la frontal.");
-
-        openCamera(); // fallback frontal
+        openCamera();
     }
 }
-
 
 // =======================================================
 // CAPTURAR FOTO
