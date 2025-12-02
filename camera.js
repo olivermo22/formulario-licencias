@@ -10,36 +10,20 @@ let captureMode = "rostro"; // "rostro" o "documento"
 async function getBestCamera() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoInputs = devices.filter(d => d.kind === "videoinput");
+        const cameras = devices.filter(d => d.kind === "videoinput");
 
-        if (videoInputs.length === 0) return null;
+        if (!cameras.length) return null;
 
-        // Ordenar cámaras por la resolución indicada en label (si está disponible)
-        let best = videoInputs[0];
+        // prioridad: rear, back, environment
+        const rear = cameras.find(c =>
+            c.label.toLowerCase().includes("back") ||
+            c.label.toLowerCase().includes("rear") ||
+            c.label.toLowerCase().includes("environment")
+        );
 
-        videoInputs.forEach(cam => {
-            const label = cam.label.toLowerCase();
+        return rear ? rear.deviceId : cameras[0].deviceId;
 
-            // Prioridad:
-            // 1. cámaras "back", "rear", "environment"
-            // 2. cámaras con "4k", "1080", "12mp", etc
-            if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
-                best = cam;
-            }
-
-            if (label.includes("4k") || label.includes("2160")) {
-                best = cam;
-            }
-
-            if (label.includes("1080") || label.includes("12mp") || label.includes("12 mp")) {
-                best = cam;
-            }
-        });
-
-        return best.deviceId;
-
-    } catch (err) {
-        console.log("Error buscando mejor cámara:", err);
+    } catch {
         return null;
     }
 }
