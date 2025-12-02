@@ -4,6 +4,45 @@
 let stream;
 let capturedBlob = null;
 let captureMode = "rostro"; // "rostro" o "documento"
+// =======================================================
+// OBTENER LA MEJOR CÁMARA DISPONIBLE (MAYOR RESOLUCIÓN)
+// =======================================================
+async function getBestCamera() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(d => d.kind === "videoinput");
+
+        if (videoInputs.length === 0) return null;
+
+        // Ordenar cámaras por la resolución indicada en label (si está disponible)
+        let best = videoInputs[0];
+
+        videoInputs.forEach(cam => {
+            const label = cam.label.toLowerCase();
+
+            // Prioridad:
+            // 1. cámaras "back", "rear", "environment"
+            // 2. cámaras con "4k", "1080", "12mp", etc
+            if (label.includes("back") || label.includes("rear") || label.includes("environment")) {
+                best = cam;
+            }
+
+            if (label.includes("4k") || label.includes("2160")) {
+                best = cam;
+            }
+
+            if (label.includes("1080") || label.includes("12mp") || label.includes("12 mp")) {
+                best = cam;
+            }
+        });
+
+        return best.deviceId;
+
+    } catch (err) {
+        console.log("Error buscando mejor cámara:", err);
+        return null;
+    }
+}
 
 // =======================================================
 // LOADER
@@ -56,9 +95,9 @@ function openCamera() {
 }
 
 // =======================================================
-// ABRIR CÁMARA - FOTO DEL DOCUMENTO
+// ABRIR CÁMARA DOCUMENTO CON LA MEJOR RESOLUCIÓN
 // =======================================================
-function openCameraDoc() {
+async function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
     resetCameraUI();
@@ -66,17 +105,38 @@ function openCameraDoc() {
     document.getElementById("overlay").style.display = "none";
     document.getElementById("camera-modal").style.display = "block";
 
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } }
-    })
-    .then(s => {
+    try {
+        const bestCamId = await getBestCamera();
+
+        const constraints = bestCamId
+            ? {
+                video: {
+                    deviceId: bestCamId,
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 },
+                    facingMode: { ideal: "environment" }
+                }
+            }
+            : {
+                video: {
+                    facingMode: { ideal: "environment" },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                }
+            };
+
+        const s = await navigator.mediaDevices.getUserMedia(constraints);
+
         stream = s;
         document.getElementById("camera").srcObject = s;
-    })
-    .catch(() => {
-        alert("No se pudo usar la cámara trasera, usando cámara frontal.");
+
+        setTimeout(adjustOverlayPosition, 400);
+
+    } catch (err) {
+        alert("No se pudo acceder a la cámara trasera, usando la frontal.");
+        console.log(err);
         openCamera();
-    });
+    }
 }
 
 // =======================================================
