@@ -63,32 +63,29 @@ function openCamera() {
 /* ============================================================
    ABRIR CÁMARA PARA DOCUMENTO
 ============================================================ */
- async function openCameraDoc() {
+function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
     resetCameraUI();
     document.getElementById("overlay").style.display = "none";
+
     document.getElementById("camera-modal").style.display = "block";
 
-    try {
-        const bestCameraId = await getBestBackCamera();
-
-        const streamResult = await navigator.mediaDevices.getUserMedia({
-            video: {
-                deviceId: { exact: bestCameraId },
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
-            }
-        });
-
-        stream = streamResult;
-        document.getElementById("camera").srcObject = streamResult;
-
-    } catch (err) {
-        console.error(err);
-        alert("No se pudo usar la cámara trasera correcta. Se usará la frontal.");
+    navigator.mediaDevices.getUserMedia({
+        video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+        }
+    })
+    .then(s => {
+        stream = s;
+        document.getElementById("camera").srcObject = s;
+    })
+    .catch(() => {
+        alert("No se pudo acceder a la cámara trasera. Usando frontal.");
         openCamera();
-    }
+    });
 }
 
 /* ============================================================
@@ -108,16 +105,13 @@ function capture() {
         capturedBlob = blob;
 
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
-        document.getElementById("preview-area").style.display = "flex";
-        document.getElementById("camera").style.display = "none";
-        document.getElementById("wa-capture-buttons").style.display = "none";
-        document.getElementById("overlay").style.display = "none";
 
-        
+        document.getElementById("camera").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
         document.getElementById("btn-capture").style.display = "none";
         document.getElementById("btn-close").style.display = "none";
 
-        
+        document.getElementById("preview-area").style.display = "flex";
 
     }, "image/jpeg", 0.92);
 }
@@ -176,10 +170,6 @@ async function acceptPhoto() {
    REHACER FOTO
 ============================================================ */
 function retakePhoto() {
-    document.getElementById("preview-area").style.display = "none";
-    document.getElementById("wa-capture-buttons").style.display = "flex";
-document.getElementById("camera").style.display = "block";
-
     capturedBlob = null;
     resetCameraUI();
 }
@@ -329,7 +319,6 @@ async function saveSignature() {
         hideLoader();
     }
 }
-
 async function getBestBackCamera() {
     const devices = await navigator.mediaDevices.enumerateDevices();
 
