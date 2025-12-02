@@ -132,55 +132,73 @@ button:active {
     inset: 0;
     background: rgba(0,0,0,0.88);
     z-index: 99999;
-    padding-top: 20px;
-    text-align: center;
+    padding-top: 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 /* Video */
 #camera {
-    width: 82%;
-    border-radius: 16px;
-    margin-top: 25px;
+    width: 92%;
+    max-width: 420px;
+    height: auto;
+    border-radius: 20px;
+    margin-top: 20px;
+    background: #000;
 }
 
 /* Silueta */
 #overlay {
-    position: fixed;
-    top: 80px;
+    position: absolute;
+    top: 90px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60%;
+    width: 65%;
     opacity: 0.55;
     pointer-events: none;
 }
 
 /* Botones dentro del modal */
-.btn-capture {
-    margin-top: 25px;
-    padding: 14px 28px;
-    background: #25d366;
-    color: white;
-    border: none;
+.btn-capture,
+.btn-close {
+    width: 80%;
+    max-width: 330px;
+    margin: 14px auto 0 auto;
+    padding: 14px;
     border-radius: 50px;
     font-size: 18px;
-    font-weight: bold;
+    display: block;
 }
 
-.btn-close {
-    margin-top: 18px;
-    padding: 10px 22px;
-    background: #ff3b30;
-    color: white;
-    border-radius: 50px;
-    border: none;
-    font-size: 16px;
+.capture-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* ============================
    PREVIEW DESPUÉS DE CAPTURAR
 ============================ */
 .preview-area {
+    .preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
     margin-top: 20px;
+}
+
+.preview-photo {
+    width: 90%;
+    max-width: 420px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+}
+
 }
 
 .preview-photo {
@@ -190,14 +208,9 @@ button:active {
 }
 
 .preview-buttons button {
-    display: block;
-    width: 80%;
+    width: 85%;
+    max-width: 350px;
     margin: 8px auto;
-    padding: 12px;
-    border-radius: 40px;
-    border: none;
-    font-weight: bold;
-    font-size: 16px;
 }
 
 .btn-accept {
