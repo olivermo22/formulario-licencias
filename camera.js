@@ -108,13 +108,16 @@ function capture() {
         capturedBlob = blob;
 
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
-
+        document.getElementById("preview-area").style.display = "flex";
         document.getElementById("camera").style.display = "none";
+        document.getElementById("wa-capture-buttons").style.display = "none";
         document.getElementById("overlay").style.display = "none";
+
+        
         document.getElementById("btn-capture").style.display = "none";
         document.getElementById("btn-close").style.display = "none";
 
-        document.getElementById("preview-area").style.display = "flex";
+        
 
     }, "image/jpeg", 0.92);
 }
@@ -173,6 +176,10 @@ async function acceptPhoto() {
    REHACER FOTO
 ============================================================ */
 function retakePhoto() {
+    document.getElementById("preview-area").style.display = "none";
+    document.getElementById("wa-capture-buttons").style.display = "flex";
+    document.getElementById("camera").style.display = "block";
+
     capturedBlob = null;
     resetCameraUI();
 }

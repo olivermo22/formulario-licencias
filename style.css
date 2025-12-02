@@ -327,8 +327,6 @@ button:active {
     padding: 10px;
 }
 
-}
-
 #overlay {
     position: absolute;
     top: 50%;
@@ -339,3 +337,117 @@ button:active {
     pointer-events: none;
 }
 
+/* ============================
+   MODAL WHATSAPP PRO
+============================ */
+.wa-modal {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none;
+    flex-direction: column;
+    z-index: 99999;
+    animation: waFadeIn .25s ease-out;
+}
+
+@keyframes waFadeIn {
+    from { opacity: 0; transform: scale(1.02); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* HEADER */
+.wa-header {
+    height: 58px;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    color: #fff;
+}
+
+.wa-header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.wa-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 26px;
+}
+
+/* VIDEO */
+.wa-video-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#camera {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wa-overlay {
+    position: absolute;
+    width: 70%;
+    opacity: 0.35;
+}
+
+/* BOTÓN DE CAPTURA */
+.wa-capture-container {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wa-capture-btn {
+    width: 85px;
+    height: 85px;
+    background: #fff;
+    border-radius: 50%;
+    border: 6px solid #25d366;
+}
+
+/* PREVIEW */
+.wa-preview {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    background: #000;
+}
+
+.wa-preview-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    flex: 1;
+}
+
+.wa-preview-actions {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wa-use-btn,
+.wa-retake-btn,
+.wa-close2-btn {
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 18px;
+    color: #fff;
+}
+
+.wa-use-btn { background: #25d366; }
+.wa-retake-btn { background: #ffcd03; }
+.wa-close2-btn { background: #ff3b30; }

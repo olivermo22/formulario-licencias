@@ -149,23 +149,39 @@
 
 </div>
 
-<!-- CÁMARA -->
-<div id="camera-modal" class="camera-modal">
-    <video id="camera" autoplay></video>
-    <img id="overlay" src="silhouette.png">
-    <button id="btn-capture" class="btn-capture" onclick="capture()">Capturar</button>
-    <button id="btn-close" class="btn-close" onclick="closeCamera()">Cerrar</button>
+<!-- MODAL DE CÁMARA (ESTILO WHATSAPP) -->
+<div id="camera-modal" class="wa-modal">
+
+    <!-- ENCABEZADO -->
+    <div class="wa-header">
+        <button class="wa-close-btn" onclick="closeCamera()">✕</button>
+        <span class="wa-header-title">Cámara</span>
+    </div>
+
+    <!-- ÁREA DE VIDEO -->
+    <div class="wa-video-container">
+        <video id="camera" autoplay playsinline></video>
+        <img id="overlay" class="wa-overlay" src="" alt="">
+    </div>
+
+    <!-- BOTÓN DE CAPTURA -->
+    <div class="wa-capture-container" id="wa-capture-buttons">
+        <button class="wa-capture-btn" onclick="capture()"></button>
+    </div>
 
     <!-- PREVIEW -->
-    <div id="preview-area" class="preview-area" style="display:none;">
-        <img id="preview-photo" class="preview-photo">
-        <div class="preview-buttons">
-            <button class="btn-accept" onclick="acceptPhoto()">Usar esta foto</button>
-            <button class="btn-retake" onclick="retakePhoto()">Tomar otra</button>
-            <button class="btn-cancel" onclick="cancelPhoto()">Cancelar</button>
+    <div id="preview-area" class="wa-preview">
+        <img id="preview-photo" class="wa-preview-img">
+
+        <div class="wa-preview-actions">
+            <button class="wa-use-btn" onclick="acceptPhoto()">Usar foto</button>
+            <button class="wa-retake-btn" onclick="retakePhoto()">Repetir</button>
+            <button class="wa-close2-btn" onclick="cancelPhoto()">Cancelar</button>
         </div>
     </div>
+
 </div>
+
 
 <div id="signature-modal" class="camera-modal" style="display:none;">
     <p id="signature-instruction" class="signature-instruction">
