@@ -106,15 +106,18 @@ async function openCameraDoc() {
     document.getElementById("camera-modal").style.display = "block";
 
     try {
+        // PRIMERA LLAMADA: pedir permiso mínimo
+        await navigator.mediaDevices.getUserMedia({ video: true });
+
+        // AHORA SÍ podemos leer las cámaras reales
         const bestCamId = await getBestCamera();
 
         const constraints = bestCamId
             ? {
                 video: {
-                    deviceId: bestCamId,
+                    deviceId: { exact: bestCamId },
                     width: { ideal: 1920 },
-                    height: { ideal: 1080 },
-                    facingMode: { ideal: "environment" }
+                    height: { ideal: 1080 }
                 }
             }
             : {
@@ -133,11 +136,14 @@ async function openCameraDoc() {
         setTimeout(adjustOverlayPosition, 400);
 
     } catch (err) {
+        console.log("Error usando cámara trasera:", err);
+
         alert("No se pudo acceder a la cámara trasera, usando la frontal.");
-        console.log(err);
-        openCamera();
+
+        openCamera(); // fallback frontal
     }
 }
+
 
 // =======================================================
 // CAPTURAR FOTO
