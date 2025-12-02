@@ -1,7 +1,7 @@
 /* ============================================================
    VARIABLES GLOBALES
 ============================================================ */
-let stream;
+let stream = null;
 let capturedBlob = null;
 let captureMode = "rostro"; // "rostro" o "documento"
 
@@ -11,15 +11,15 @@ let captureMode = "rostro"; // "rostro" o "documento"
 function showLoader() {
     document.getElementById("loader").style.display = "flex";
 }
-
 function hideLoader() {
     document.getElementById("loader").style.display = "none";
 }
 
 /* ============================================================
-   RESET DE LA UI DE LA CÁMARA
+   RESET UI
 ============================================================ */
 function resetCameraUI() {
+    // Estos elementos SÍ existen en la versión A
     document.getElementById("preview-area").style.display = "none";
     document.getElementById("camera").style.display = "block";
     document.getElementById("btn-capture").style.display = "block";
@@ -34,7 +34,7 @@ function resetCameraUI() {
 }
 
 /* ============================================================
-   ABRIR CÁMARA PARA ROSTRO
+   ABRIR CÁMARA ROSTRO
 ============================================================ */
 function openCamera() {
     captureMode = "rostro";
@@ -44,11 +44,7 @@ function openCamera() {
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
-        video: {
-            facingMode: "user",
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-        }
+        video: { facingMode: "user" }
     })
     .then(s => {
         stream = s;
@@ -56,34 +52,31 @@ function openCamera() {
     })
     .catch(err => {
         console.error(err);
-        alert("No se pudo acceder a la cámara.");
+        alert("No se pudo acceder a la cámara frontal.");
     });
 }
 
 /* ============================================================
-   ABRIR CÁMARA PARA DOCUMENTO
+   ABRIR CÁMARA DOCUMENTO
 ============================================================ */
 function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
     resetCameraUI();
-    document.getElementById("overlay").style.display = "none";
 
+    document.getElementById("overlay").style.display = "none";
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
-        video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
-        }
+        video: { facingMode: { ideal: "environment" } }
     })
     .then(s => {
         stream = s;
         document.getElementById("camera").srcObject = s;
     })
-    .catch(() => {
-        alert("No se pudo acceder a la cámara trasera. Usando frontal.");
+    .catch(err => {
+        console.error(err);
+        alert("No se pudo usar la cámara trasera. Intentando cámara frontal.");
         openCamera();
     });
 }
@@ -106,61 +99,47 @@ function capture() {
 
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
 
+        // Ocultar elementos
         document.getElementById("camera").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("btn-capture").style.display = "none";
         document.getElementById("btn-close").style.display = "none";
 
         document.getElementById("preview-area").style.display = "flex";
-
     }, "image/jpeg", 0.92);
 }
 
 /* ============================================================
-   ACEPTAR FOTO → SUBIR AL SERVIDOR
+   ACEPTAR FOTO (SUBE AL SERVIDOR)
 ============================================================ */
 async function acceptPhoto() {
-
-    if (!capturedBlob) {
-        alert("No hay foto capturada.");
-        return;
-    }
+    if (!capturedBlob) return alert("No hay foto capturada.");
 
     showLoader();
 
     try {
-        const formData = new FormData();
+        const fd = new FormData();
         const fileName = captureMode === "rostro" ? "rostro.jpg" : "documento.jpg";
-        formData.append("foto", capturedBlob, fileName);
+        fd.append("foto", capturedBlob, fileName);
 
-        const response = await fetch("/upload", {
-            method: "POST",
-            body: formData
-        });
+        const res = await fetch("/upload", { method: "POST", body: fd });
+        const data = await res.json();
 
-        const data = await response.json();
-
-        if (!data.success) {
-            alert("Error al subir la foto.");
-            return;
-        }
+        if (!data.success) return alert("Error subiendo imagen");
 
         if (captureMode === "rostro") {
             document.getElementById("foto_url").value = data.url;
             document.getElementById("photo-preview").style.display = "block";
             document.getElementById("final-photo").src = data.url;
-        }
-
-        if (captureMode === "documento") {
+        } else {
             document.getElementById("foto_documento_url").value = data.url;
             document.getElementById("photo-preview-doc").style.display = "block";
             document.getElementById("final-photo-doc").src = data.url;
         }
 
         closeCamera();
-
     } catch (err) {
-        console.error("Error subiendo imagen:", err);
+        console.error(err);
     } finally {
         hideLoader();
     }
@@ -175,7 +154,7 @@ function retakePhoto() {
 }
 
 /* ============================================================
-   CANCELAR FOTO
+   CANCELAR
 ============================================================ */
 function cancelPhoto() {
     capturedBlob = null;
@@ -190,7 +169,6 @@ function closeCamera() {
         stream.getTracks().forEach(t => t.stop());
         stream = null;
     }
-
     resetCameraUI();
     document.getElementById("camera-modal").style.display = "none";
 }
@@ -205,7 +183,6 @@ let lastY = 0;
 
 function openSignature() {
     document.getElementById("signature-modal").style.display = "block";
-    document.getElementById("signature-instruction").style.display = "block";
 
     sigCanvas = document.getElementById("signature-canvas");
     sigCtx = sigCanvas.getContext("2d");
@@ -213,17 +190,16 @@ function openSignature() {
     sigCanvas.width = sigCanvas.offsetWidth;
     sigCanvas.height = sigCanvas.offsetHeight;
 
-    sigCtx.fillStyle = "#ffffff";
+    sigCtx.fillStyle = "#fff";
     sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
 
-    sigCanvas.addEventListener("touchstart", startDraw, false);
-    sigCanvas.addEventListener("touchmove", drawTouch, false);
-    sigCanvas.addEventListener("touchend", stopDraw, false);
-    
-    sigCanvas.addEventListener("mousedown", startDraw, false);
-    sigCanvas.addEventListener("mousemove", drawMouse, false);
-    sigCanvas.addEventListener("mouseup", stopDraw, false);
-    sigCanvas.addEventListener("mouseout", stopDraw, false);
+    sigCanvas.addEventListener("touchstart", startDraw);
+    sigCanvas.addEventListener("touchmove", drawTouch);
+    sigCanvas.addEventListener("touchend", stopDraw);
+
+    sigCanvas.addEventListener("mousedown", startDraw);
+    sigCanvas.addEventListener("mousemove", drawMouse);
+    sigCanvas.addEventListener("mouseup", stopDraw);
 }
 
 function startDraw(e) {
@@ -232,7 +208,6 @@ function startDraw(e) {
     lastX = pos.x;
     lastY = pos.y;
 }
-
 function drawMouse(e) {
     if (!drawing) return;
     drawLine(e.offsetX, e.offsetY);
@@ -246,7 +221,7 @@ function drawTouch(e) {
 }
 
 function drawLine(x, y) {
-    sigCtx.strokeStyle = "#000000";
+    sigCtx.strokeStyle = "#000";
     sigCtx.lineWidth = 3;
     sigCtx.lineCap = "round";
 
@@ -264,78 +239,48 @@ function stopDraw() {
 }
 
 function getPos(e) {
-    let rect = sigCanvas.getBoundingClientRect();
+    const rect = sigCanvas.getBoundingClientRect();
     if (e.touches) {
-        return {
-            x: e.touches[0].clientX - rect.left,
-            y: e.touches[0].clientY - rect.top
-        };
+        return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     }
     return { x: e.offsetX, y: e.offsetY };
 }
 
 function clearSignature() {
-    sigCtx.fillStyle = "#ffffff";
+    sigCtx.fillStyle = "#fff";
     sigCtx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
 }
 
 function closeSignature() {
     document.getElementById("signature-modal").style.display = "none";
-    document.getElementById("signature-instruction").style.display = "none";
 }
 
+/* ============================================================
+   GUARDAR FIRMA
+============================================================ */
 async function saveSignature() {
-
     showLoader();
 
     try {
         const dataURL = sigCanvas.toDataURL("image/png");
         const blob = await (await fetch(dataURL)).blob();
 
-        const formData = new FormData();
-        formData.append("foto", blob, "firma.png");
+        const fd = new FormData();
+        fd.append("foto", blob, "firma.png");
 
-        const response = await fetch("/upload", {
-            method: "POST",
-            body: formData
-        });
+        const res = await fetch("/upload", { method: "POST", body: fd });
+        const data = await res.json();
 
-        const data = await response.json();
-
-        if (!data.success) {
-            alert("Error al subir la firma.");
-            return;
-        }
+        if (!data.success) return alert("Error subiendo firma");
 
         document.getElementById("firma_url").value = data.url;
         document.getElementById("signature-preview").style.display = "block";
         document.getElementById("final-signature").src = data.url;
 
         closeSignature();
-
     } catch (err) {
         console.error(err);
     } finally {
         hideLoader();
     }
-}
-async function getBestBackCamera() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-
-    const videoDevices = devices.filter(d => d.kind === "videoinput");
-
-    // Intentamos encontrar la cámara trasera por nombre
-    let backCameras = videoDevices.filter(d =>
-        d.label.toLowerCase().includes("back") ||
-        d.label.toLowerCase().includes("rear") ||
-        d.label.toLowerCase().includes("environment")
-    );
-
-    // Si encontramos varias, elegir la más probable de alta calidad
-    if (backCameras.length > 0) {
-        return backCameras[backCameras.length - 1].deviceId;
-    }
-
-    // Si no detecta, usar la última (suele ser la trasera)
-    return videoDevices[videoDevices.length - 1].deviceId;
 }

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Solicitud Licencia de Conducir</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,78 +10,82 @@
 <body>
 
 <div class="form-wrapper">
-    
+
     <h1>SOLICITUD LICENCIA DE CONDUCIR</h1>
 
-    <!-- BOTÓN PARA ABRIR LA CÁMARA -->
+    <!-- FOTO DEL TITULAR -->
     <label>* FOTO DEL TITULAR (TOMAR CON CÁMARA)</label>
     <button class="btn-camera" onclick="openCamera()">Tomar fotografía</button>
     <input type="hidden" id="foto_url">
 
     <div id="photo-preview" class="photo-preview" style="display:none;">
         <p>Foto cargada correctamente</p>
-        <img id="final-photo" />
+        <img id="final-photo">
     </div>
 
+    <!-- FOTO DOCUMENTO -->
     <label>* FOTO DE IDENTIFICACIÓN (INE / DOCUMENTO)</label>
-<button class="btn-camera" onclick="openCameraDoc()">Tomar foto del documento</button>
-<input type="hidden" id="foto_documento_url">
+    <button class="btn-camera" onclick="openCameraDoc()">Tomar foto del documento</button>
+    <input type="hidden" id="foto_documento_url">
 
-<div id="photo-preview-doc" class="photo-preview" style="display:none;">
-    <p>Documento cargado correctamente</p>
-    <img id="final-photo-doc" />
-</div>
-<label>* FIRMA DEL TITULAR</label>
-<button class="btn-camera" onclick="openSignature()">Capturar firma</button>
-<input type="hidden" id="firma_url">
+    <div id="photo-preview-doc" class="photo-preview" style="display:none;">
+        <p>Documento cargado correctamente</p>
+        <img id="final-photo-doc">
+    </div>
 
-<div id="signature-preview" class="photo-preview" style="display:none;">
-    <p>Firma cargada correctamente</p>
-    <img id="final-signature" />
-</div>
+    <!-- FIRMA -->
+    <label>* FIRMA DEL TITULAR</label>
+    <button class="btn-camera" onclick="openSignature()">Capturar firma</button>
+    <input type="hidden" id="firma_url">
 
-    
-    <div class="section-title admin-trigger">DATOS PERSONALES</div>
+    <div id="signature-preview" class="photo-preview" style="display:none;">
+        <p>Firma cargada correctamente</p>
+        <img id="final-signature">
+    </div>
+
+    <!-- DATOS PERSONALES -->
+    <h2 class="admin-trigger">DATOS PERSONALES</h2>
 
     <label>* TELÉFONO (WHATSAPP)</label>
-    <input class="input" id="telefono" maxlength="10">
+    <input id="telefono" maxlength="10">
 
     <label>* TIPO DE LICENCIA</label>
-    <select class="input" id="tipo_licencia">
+    <select id="tipo_licencia">
         <option value="">Seleccionar…</option>
-        <option>CHOFER - C</option>
-        <option>AUTOMOVILISTA - A</option>
-        <option>MOTOCICLISTA - M</option>
+        <option>CHOFER-C</option>
+        <option>AUTOMOVILISTA-A</option>
+        <option>MOTOCICLISTA-M</option>
     </select>
 
     <label>* VALIDA POR</label>
-    <select class="input" id="valida_por">
+    <select id="valida_por">
         <option value="">Seleccionar…</option>
         <option>3 AÑOS $650</option>
         <option>5 AÑOS $700</option>
     </select>
 
     <label>* NOMBRE COMPLETO</label>
-    <input class="input" id="nombre">
+    <input id="nombre">
 
     <label>* CURP</label>
-    <input class="input" id="curp" maxlength="18">
+    <input id="curp" maxlength="18">
 
     <label>* CON BASE EN LOS LINEAMIENTOS… ¿ESTÁ DE ACUERDO?</label>
-    <select class="input" id="domicilio">
+    <select id="domicilio">
         <option value="">Seleccionar…</option>
         <option>SI</option>
     </select>
 
     <small>
-        Como la licencia se tramita en Guerrero, se pide que salga con un domicilio de aquí. En caso de no tener domicilio de Guerrero, la licencia saldrá con el domicilio del ayuntamiento donde se realiza el trámite.
+        Como la licencia se tramita en Guerrero, se pide que salga con un domicilio de aquí.
+        En caso de no tener domicilio, saldrá con el del ayuntamiento donde se realiza el trámite.
     </small>
 
     <label>* ALERGIAS / RESTRICCIONES</label>
-    <input class="input" id="alergias">
+    <input id="alergias">
 
     <label>* TIPO DE SANGRE</label>
-    <select class="input" id="sangre">
+    <select id="sangre">
         <option value="">Seleccionar…</option>
         <option>AB+</option><option>AB-</option>
         <option>A+</option><option>A-</option>
@@ -90,253 +94,90 @@
         <option>DESCONOCE</option>
     </select>
 
-    <label>* CONTACTO EN CASO DE EMERGENCIA (NOMBRE)</label>
-    <input class="input" id="emergencia_nombre">
+    <label>* CONTACTO EMERGENCIA</label>
+    <input id="emergencia_nombre">
+    <label>* TEL. EMERGENCIA</label>
+    <input id="emergencia_tel" maxlength="10">
 
-    <label>* TELÉFONO EMERGENCIA</label>
-    <input class="input" id="emergencia_tel" maxlength="10">
-
-    <div class="section-title admin-trigger">DATOS PARA ENVÍO</div>
+    <h2 class="admin-trigger">DATOS PARA ENVÍO</h2>
 
     <!-- PANEL SECRETO -->
-    <div id="admin-panel" class="admin-panel" style="display:none;">
+    <div id="admin-panel" style="display:none;">
         <h2>FOTOS CARGADAS</h2>
         <div id="file-list"></div>
     </div>
 
     <label>* NOMBRE DESTINATARIO</label>
-    <input class="input" id="dest_nombre">
+    <input id="dest_nombre">
 
     <label>* TELÉFONO DESTINATARIO</label>
-    <input class="input" id="dest_tel" maxlength="10">
+    <input id="dest_tel" maxlength="10">
 
     <label>* CALLE</label>
-    <input class="input" id="calle">
+    <input id="calle">
 
     <label>* NUM EXT</label>
-    <input class="input" id="numero_ext">
+    <input id="numero_ext">
 
     <label>* COLONIA</label>
-    <input class="input" id="colonia">
+    <input id="colonia">
 
     <label>* CÓDIGO POSTAL</label>
-    <input class="input" id="cp" maxlength="5">
+    <input id="cp" maxlength="5">
 
     <label>* CIUDAD</label>
-    <input class="input" id="ciudad">
+    <input id="ciudad">
 
     <label>* ESTADO</label>
-    <select class="input" id="estado">
-        <option>Aguascalientes</option><option>Baja California</option>
-        <option>Baja California Sur</option><option>Campeche</option>
-        <option>CDMX</option><option>Chiapas</option>
-        <option>Chihuahua</option><option>Coahuila</option>
-        <option>Colima</option><option>Durango</option>
-        <option>Estado de México</option><option>Guanajuato</option>
-        <option>Guerrero</option><option>Hidalgo</option>
-        <option>Jalisco</option><option>Michoacán</option>
-        <option>Morelos</option><option>Nayarit</option>
-        <option>Nuevo León</option><option>Oaxaca</option>
-        <option>Puebla</option><option>Querétaro</option>
-        <option>Quintana Roo</option><option>San Luis Potosí</option>
-        <option>Sinaloa</option><option>Sonora</option>
-        <option>Tabasco</option><option>Tamaulipas</option>
-        <option>Tlaxcala</option><option>Veracruz</option>
-        <option>Yucatán</option><option>Zacatecas</option>
+    <select id="estado">
+        <option value="">Seleccionar…</option>
+        <option>Guerrero</option>
+        <option>Estado de México</option>
+        <option>CDMX</option>
     </select>
 
     <button class="btn-submit" onclick="enviarWhatsApp()">Enviar</button>
 
 </div>
 
-<!-- MODAL DE CÁMARA (ESTILO WHATSAPP) -->
-<div id="camera-modal" class="wa-modal">
+<!-- MODAL DE CÁMARA ORIGINAL -->
+<div id="camera-modal" class="camera-modal">
 
-    <div class="wa-header">
-        <button class="wa-close-btn" onclick="closeCamera()">✕</button>
-        <span class="wa-header-title">Cámara</span>
-    </div>
+    <video id="camera" autoplay playsinline></video>
+    <img id="overlay" class="overlay">
 
-    <div class="wa-video-container">
-        <video id="camera" autoplay playsinline></video>
-        <img id="overlay" class="wa-overlay" src="">
-    </div>
+    <button id="btn-capture" class="btn-capture" onclick="capture()">Capturar</button>
+    <button id="btn-close" class="btn-close" onclick="closeCamera()">Cerrar</button>
 
-    <!-- ESTE DIV ES CRÍTICO PARA QUE NO FALLE -->
-    <div class="wa-capture-container" id="wa-capture-buttons">
-        <button class="wa-capture-btn" onclick="capture()"></button>
-    </div>
+    <div id="preview-area" class="preview-area">
+        <img id="preview-photo">
 
-    <div id="preview-area" class="wa-preview">
-        <img id="preview-photo" class="wa-preview-img">
-
-        <div class="wa-preview-actions">
-            <button class="wa-use-btn" onclick="acceptPhoto()">Usar foto</button>
-            <button class="wa-retake-btn" onclick="retakePhoto()">Repetir</button>
-            <button class="wa-close2-btn" onclick="cancelPhoto()">Cancelar</button>
-        </div>
+        <button onclick="acceptPhoto()" class="btn-accept">Usar esta foto</button>
+        <button onclick="retakePhoto()" class="btn-retake">Repetir</button>
+        <button onclick="cancelPhoto()" class="btn-cancel">Cancelar</button>
     </div>
 
 </div>
 
-
+<!-- MODAL FIRMA -->
 <div id="signature-modal" class="camera-modal" style="display:none;">
-    <p id="signature-instruction" class="signature-instruction">
-    Dibuja tu firma dentro del recuadro
-</p>
+    <p class="signature-instruction">Dibuja tu firma dentro del recuadro</p>
 
     <canvas id="signature-canvas"></canvas>
 
-    <div class="preview-buttons" style="margin-top:20px;">
-        <button class="btn-accept" onclick="saveSignature()">Confirmar firma</button>
-        <button class="btn-retake" onclick="clearSignature()">Limpiar</button>
-        <button class="btn-cancel" onclick="closeSignature()">Cancelar</button>
-    </div>
-
+    <button onclick="saveSignature()" class="btn-accept">Confirmar firma</button>
+    <button onclick="clearSignature()" class="btn-retake">Limpiar</button>
+    <button onclick="closeSignature()" class="btn-cancel">Cancelar</button>
 </div>
 
-<script src="camera.js"></script>
-
-<!-- PANEL SECRETO -->
-<script>
-let adminClicks = 0;
-
-document.querySelectorAll(".admin-trigger").forEach(el => {
-    el.addEventListener("click", () => {
-        adminClicks++;
-
-        if (adminClicks >= 2) {
-            adminClicks = 0;
-            loadUploads();
-        }
-
-        setTimeout(() => adminClicks = 0, 800);
-    });
-});
-
-async function loadUploads() {
-
-    const pass = prompt("Ingrese contraseña para acceder:");
-
-    if (pass !== "1793") {
-        alert("Contraseña incorrecta.");
-        return;
-    }
-
-    const panel = document.getElementById("admin-panel");
-    const list = document.getElementById("file-list");
-
-    panel.style.display = "block";
-    list.innerHTML = "Cargando archivos...";
-
-    const res = await fetch("/list-uploads");
-    const data = await res.json();
-
-    list.innerHTML = "";
-
-    if (data.files.length === 0) {
-        list.innerHTML = "<p>No hay fotos cargadas.</p>";
-        return;
-    }
-
-    data.files.forEach(file => {
-        const div = document.createElement("div");
-        div.className = "file-entry";
-
-        div.innerHTML = `
-            <img src="/uploads/${file.name}" class="thumb">
-            <div class="info">
-                <p><b>${file.name}</b></p>
-                <p>Tamaño: ${(file.size/1024).toFixed(1)} KB</p>
-            </div>
-            <button class="delete-btn" onclick="deleteFile('${file.name}')">Eliminar</button>
-        `;
-
-        list.appendChild(div);
-    });
-}
-
-async function deleteFile(name) {
-    if (!confirm("¿Eliminar esta foto?")) return;
-
-    const req = await fetch("/delete-upload", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ name })
-    });
-
-    const res = await req.json();
-
-    if (res.success) loadUploads();
-    else alert("Error al eliminar archivo.");
-}
-</script>
-
-<script>
-function enviarWhatsApp() {
-    const t = id => document.getElementById(id).value.trim();
-
-    const campos = [
-        "foto_url","foto_documento_url","firma_url","telefono","tipo_licencia","valida_por",
-        "nombre","curp","domicilio","alergias","sangre",
-        "emergencia_nombre","emergencia_tel",
-        "dest_nombre","dest_tel","calle","numero_ext","colonia","cp","ciudad","estado"
-    ];
-
-    for (let c of campos) {
-        if (!t(c)) return alert("Completa todos los campos.");
-    }
-
-    const folio = Math.floor(10000 + Math.random() * 90000);
-
-    const mensaje = `
-SOLICITUD LICENCIA DE CONDUCIR
-Folio #${folio}
-
-TELÉFONO: ${t("telefono")}
-TIPO DE LICENCIA: ${t("tipo_licencia")}
-VALIDA POR: ${t("valida_por")}
-NOMBRE: ${t("nombre")}
-CURP: ${t("curp")}
-DOMICILIO DE GUERRERO ACEPTADO : SI
-ALERGIAS: ${t("alergias")}
-TIPO DE SANGRE: ${t("sangre")}
-CONTACTO EMERGENCIA: ${t("emergencia_nombre")} (${t("emergencia_tel")})
-
-DATOS DE ENVÍO
-NOMBRE DESTINATARIO : ${t("dest_nombre")}
-TELÉFONO DESTINATARIO : ${t("dest_tel")}
-CALLE : ${t("calle")}
-NÚMERO : ${t("numero_ext")}
-COLONIA : ${t("colonia")}
-CP : ${t("cp")}
-CIUDAD Y ESTADO : ${t("ciudad")}, ${t("estado")}
-
-FOTO: ${t("foto_url")}
-FOTO DEL DOCUMENTO: ${t("foto_documento_url")}
-FIRMA DIGITAL: ${t("firma_url")}
-
-Tu solicitud será asignada al número 7225600905 para continuar el trámite.
-`;
-showLoader();
-
-setTimeout(() => {
-    hideLoader();
-    window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;
-}, 900);
-
-
-    window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;
-}
-</script>
-
-<!-- LOADER GLOBAL -->
-<div id="loader" class="loader-overlay" style="display:none;">
+<div id="loader" class="loader-overlay">
     <div class="loader-box">
         <div class="spinner"></div>
         <p>Procesando...</p>
     </div>
 </div>
+
+<script src="camera.js"></script>
 
 </body>
 </html>
