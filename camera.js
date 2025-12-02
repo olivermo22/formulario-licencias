@@ -1,31 +1,13 @@
-// ===============================
-// VARIABLES GLOBALES
-// ===============================
+/* ============================================================
+   VARIABLES GLOBALES
+============================================================ */
 let stream;
 let capturedBlob = null;
-let captureMode = "rostro"; // rostro | documento
+let captureMode = "rostro"; // "rostro" o "documento"
 
-// ===============================
-// RESET DE UI DE CÁMARA
-// ===============================
-function resetCameraUI() {
-    document.getElementById("preview-area").style.display = "none";
-    document.getElementById("camera").style.display = "block";
-    document.getElementById("btn-capture").style.display = "block";
-    document.getElementById("btn-close").style.display = "block";
-
-    // Restaurar overlay para rostro
-    if (captureMode === "rostro") {
-        document.getElementById("overlay").src = "silhouette.png";
-        document.getElementById("overlay").style.display = "block";
-    }
-
-    // Ocultar overlay para documento
-    if (captureMode === "documento") {
-        document.getElementById("overlay").style.display = "none";
-    }
-}
-
+/* ============================================================
+   LOADER
+============================================================ */
 function showLoader() {
     document.getElementById("loader").style.display = "flex";
 }
@@ -34,9 +16,26 @@ function hideLoader() {
     document.getElementById("loader").style.display = "none";
 }
 
-// ===============================
-// ABRIR CÁMARA (ROSTRO)
-// ===============================
+/* ============================================================
+   RESET DE LA UI DE LA CÁMARA
+============================================================ */
+function resetCameraUI() {
+    document.getElementById("preview-area").style.display = "none";
+    document.getElementById("camera").style.display = "block";
+    document.getElementById("btn-capture").style.display = "block";
+    document.getElementById("btn-close").style.display = "block";
+
+    if (captureMode === "rostro") {
+        document.getElementById("overlay").src = "silhouette.png";
+        document.getElementById("overlay").style.display = "block";
+    } else {
+        document.getElementById("overlay").style.display = "none";
+    }
+}
+
+/* ============================================================
+   ABRIR CÁMARA PARA ROSTRO
+============================================================ */
 function openCamera() {
     captureMode = "rostro";
     capturedBlob = null;
@@ -45,52 +44,53 @@ function openCamera() {
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
-    video: {
-        facingMode: "user",
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-    }
-})
-        .then(s => {
-            stream = s;
-            document.getElementById("camera").srcObject = s;
-        })
-        .catch(() => alert("No se pudo acceder a la cámara."));
+        video: {
+            facingMode: "user",
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+        }
+    })
+    .then(s => {
+        stream = s;
+        document.getElementById("camera").srcObject = s;
+    })
+    .catch(err => {
+        console.error(err);
+        alert("No se pudo acceder a la cámara.");
+    });
 }
 
-// ===============================
-// ABRIR CÁMARA (DOCUMENTO)
-// ===============================
+/* ============================================================
+   ABRIR CÁMARA PARA DOCUMENTO
+============================================================ */
 function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
     resetCameraUI();
-
     document.getElementById("overlay").style.display = "none";
+
     document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
-    video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-    }
-})
-
+        video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+        }
     })
     .then(s => {
         stream = s;
         document.getElementById("camera").srcObject = s;
     })
     .catch(() => {
-        alert("No se pudo acceder a la cámara trasera. Se usará la frontal.");
+        alert("No se pudo acceder a la cámara trasera. Usando frontal.");
         openCamera();
     });
 }
 
-// ===============================
-// CAPTURAR FOTO
-// ===============================
+/* ============================================================
+   CAPTURAR FOTO
+============================================================ */
 function capture() {
     const video = document.getElementById("camera");
     const canvas = document.createElement("canvas");
@@ -104,24 +104,21 @@ function capture() {
     canvas.toBlob(blob => {
         capturedBlob = blob;
 
-        // Mostrar preview
         document.getElementById("preview-photo").src = URL.createObjectURL(blob);
 
-        // Ocultar UI de cámara
         document.getElementById("camera").style.display = "none";
         document.getElementById("overlay").style.display = "none";
         document.getElementById("btn-capture").style.display = "none";
         document.getElementById("btn-close").style.display = "none";
 
-        // Mostrar UI de preview
         document.getElementById("preview-area").style.display = "flex";
 
-    }, "image/jpeg",0.92);
+    }, "image/jpeg", 0.92);
 }
 
-// ===============================
-// USAR ESTA FOTO
-// ===============================
+/* ============================================================
+   ACEPTAR FOTO → SUBIR AL SERVIDOR
+============================================================ */
 async function acceptPhoto() {
 
     if (!capturedBlob) {
@@ -129,11 +126,11 @@ async function acceptPhoto() {
         return;
     }
 
-    showLoader(); // 👈 empieza el loader
+    showLoader();
 
     try {
         const formData = new FormData();
-        const fileName = captureMode === "rostro" ? "rostro.png" : "documento.png";
+        const fileName = captureMode === "rostro" ? "rostro.jpg" : "documento.jpg";
         formData.append("foto", capturedBlob, fileName);
 
         const response = await fetch("/upload", {
@@ -152,7 +149,9 @@ async function acceptPhoto() {
             document.getElementById("foto_url").value = data.url;
             document.getElementById("photo-preview").style.display = "block";
             document.getElementById("final-photo").src = data.url;
-        } else {
+        }
+
+        if (captureMode === "documento") {
             document.getElementById("foto_documento_url").value = data.url;
             document.getElementById("photo-preview-doc").style.display = "block";
             document.getElementById("final-photo-doc").src = data.url;
@@ -161,32 +160,31 @@ async function acceptPhoto() {
         closeCamera();
 
     } catch (err) {
-        console.error("Error aceptando foto:", err);
-        alert("Ocurrió un problema subiendo la imagen.");
+        console.error("Error subiendo imagen:", err);
     } finally {
-        hideLoader(); // 👈 siempre se oculta
+        hideLoader();
     }
 }
 
-// ===============================
-// REHACER FOTO
-// ===============================
+/* ============================================================
+   REHACER FOTO
+============================================================ */
 function retakePhoto() {
     capturedBlob = null;
     resetCameraUI();
 }
 
-// ===============================
-// CANCELAR
-// ===============================
+/* ============================================================
+   CANCELAR FOTO
+============================================================ */
 function cancelPhoto() {
     capturedBlob = null;
     closeCamera();
 }
 
-// ===============================
-// CERRAR CÁMARA CORRECTAMENTE
-// ===============================
+/* ============================================================
+   CERRAR CÁMARA
+============================================================ */
 function closeCamera() {
     if (stream) {
         stream.getTracks().forEach(t => t.stop());
@@ -197,9 +195,9 @@ function closeCamera() {
     document.getElementById("camera-modal").style.display = "none";
 }
 
-// ==================================================
-//     FIRMA DIGITAL (SIN CAMBIOS - YA FUNCIONABA)
-// ==================================================
+/* ============================================================
+   FIRMA DIGITAL
+============================================================ */
 let sigCanvas, sigCtx;
 let drawing = false;
 let lastX = 0;
@@ -316,10 +314,8 @@ async function saveSignature() {
         closeSignature();
 
     } catch (err) {
-        console.error("Error guardando firma:", err);
+        console.error(err);
     } finally {
         hideLoader();
     }
 }
-
-
