@@ -266,3 +266,48 @@ select:focus {
     margin-bottom: 10px;
     font-weight: 600;
 }
+
+/* ============================
+   LOADER GLOBAL
+============================ */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-box {
+    text-align: center;
+    color: white;
+    font-size: 18px;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(255,255,255,0.3);
+    border-top-color: #25d366;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================
+   ANIMACIÓN DE BOTONES (PRESS)
+============================ */
+button {
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+button:active {
+    transform: scale(0.95);
+    opacity: 0.85;
+}

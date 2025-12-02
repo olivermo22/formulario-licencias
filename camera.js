@@ -26,6 +26,14 @@ function resetCameraUI() {
     }
 }
 
+function showLoader() {
+    document.getElementById("loader").style.display = "flex";
+}
+
+function hideLoader() {
+    document.getElementById("loader").style.display = "none";
+}
+
 // ===============================
 // ABRIR CÁMARA (ROSTRO)
 // ===============================
@@ -111,7 +119,7 @@ async function acceptPhoto() {
     const formData = new FormData();
     const fileName = captureMode === "rostro" ? "rostro.png" : "documento.png";
     formData.append("foto", capturedBlob, fileName);
-
+    showLoader();
     const response = await fetch("/upload", {
         method: "POST",
         body: formData
@@ -120,6 +128,7 @@ async function acceptPhoto() {
     const data = await response.json();
 
     if (!data.success) {
+        hideLoader();
         alert("Error al subir la foto.");
         return;
     }
@@ -259,9 +268,11 @@ function closeSignature() {
 }
 
 async function saveSignature() {
-    const dataURL = sigCanvas.toDataURL("image/png");
+    showLoader(); // 👈 agregado
 
+    const dataURL = sigCanvas.toDataURL("image/png");
     const blob = await (await fetch(dataURL)).blob();
+
     const formData = new FormData();
     formData.append("foto", blob, "firma.png");
 
@@ -271,6 +282,8 @@ async function saveSignature() {
     });
 
     const data = await response.json();
+
+    hideLoader(); // 👈 agregado
 
     if (!data.success) {
         alert("Error al subir la firma.");
@@ -283,3 +296,4 @@ async function saveSignature() {
 
     closeSignature();
 }
+
