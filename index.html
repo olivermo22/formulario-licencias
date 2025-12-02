@@ -152,24 +152,21 @@
 <!-- MODAL DE CÁMARA (ESTILO WHATSAPP) -->
 <div id="camera-modal" class="wa-modal">
 
-    <!-- ENCABEZADO -->
     <div class="wa-header">
         <button class="wa-close-btn" onclick="closeCamera()">✕</button>
         <span class="wa-header-title">Cámara</span>
     </div>
 
-    <!-- ÁREA DE VIDEO -->
     <div class="wa-video-container">
         <video id="camera" autoplay playsinline></video>
-        <img id="overlay" class="wa-overlay" src="" alt="">
+        <img id="overlay" class="wa-overlay" src="">
     </div>
 
-    <!-- BOTÓN DE CAPTURA -->
+    <!-- ESTE DIV ES CRÍTICO PARA QUE NO FALLE -->
     <div class="wa-capture-container" id="wa-capture-buttons">
         <button class="wa-capture-btn" onclick="capture()"></button>
     </div>
 
-    <!-- PREVIEW -->
     <div id="preview-area" class="wa-preview">
         <img id="preview-photo" class="wa-preview-img">
 
