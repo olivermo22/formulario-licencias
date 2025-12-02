@@ -124,7 +124,7 @@ button:active {
 }
 
 /* ============================
-   MODAL DE CÁMARA/FIRMA
+   MODAL DE CÁMARA (CORREGIDO)
 ============================ */
 .camera-modal {
     display: none;
@@ -132,28 +132,28 @@ button:active {
     inset: 0;
     background: rgba(0,0,0,0.88);
     z-index: 99999;
-    padding-top: 40px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+
+    padding-top: 40px;
 }
 
-/* Video */
+/* VIDEO CENTRADO */
 #camera {
     width: 92%;
     max-width: 420px;
     height: auto;
     border-radius: 20px;
-    margin-top: 20px;
     background: #000;
 }
 
-/* Silueta */
+/* SILUETA CENTRADA */
 #overlay {
     position: absolute;
-    top: 90px;
+    top: 120px;
     left: 50%;
     transform: translateX(-50%);
     width: 65%;
@@ -161,30 +161,41 @@ button:active {
     pointer-events: none;
 }
 
-/* Botones dentro del modal */
-.btn-capture,
-.btn-close {
-    width: 80%;
-    max-width: 330px;
-    margin: 14px auto 0 auto;
-    padding: 14px;
-    border-radius: 50px;
-    font-size: 18px;
-    display: block;
-}
-
+/* BOTONES CAPTURA DEBAJO DEL VIDEO */
 .capture-group {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 15px;
+}
+
+.btn-capture,
+.btn-close {
+    width: 80%;
+    max-width: 330px;
+    padding: 14px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    display: block;
+    margin: 10px auto;
+}
+
+.btn-capture {
+    background: #25d366;
+    color: white;
+}
+
+.btn-close {
+    background: #ff3b30;
+    color: white;
 }
 
 /* ============================
    PREVIEW DESPUÉS DE CAPTURAR
 ============================ */
 .preview-area {
-    .preview-area {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -195,22 +206,16 @@ button:active {
 .preview-photo {
     width: 90%;
     max-width: 420px;
-    border-radius: 16px;
+    border-radius: 18px;
     margin-bottom: 20px;
-}
-
-}
-
-.preview-photo {
-    width: 80%;
-    border-radius: 16px;
-    margin-bottom: 18px;
 }
 
 .preview-buttons button {
     width: 85%;
     max-width: 350px;
     margin: 8px auto;
+    padding: 12px;
+    border-radius: 50px;
 }
 
 .btn-accept {
