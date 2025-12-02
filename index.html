@@ -306,7 +306,12 @@ FIRMA DIGITAL: ${t("firma_url")}
 Tu solicitud será asignada al número 7225600905 para continuar el trámite.
 `;
 showLoader();
-setTimeout(() => hideLoader(), 800); // loader visual breve
+
+setTimeout(() => {
+    hideLoader();
+    window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;
+}, 900);
+
 
     window.location.href = `https://wa.me/527225600905?text=${encodeURIComponent(mensaje)}`;
 }

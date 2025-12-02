@@ -111,42 +111,49 @@ function capture() {
 // USAR ESTA FOTO
 // ===============================
 async function acceptPhoto() {
+
     if (!capturedBlob) {
         alert("No hay foto capturada.");
         return;
     }
 
-    const formData = new FormData();
-    const fileName = captureMode === "rostro" ? "rostro.png" : "documento.png";
-    formData.append("foto", capturedBlob, fileName);
-    showLoader();
-    const response = await fetch("/upload", {
-        method: "POST",
-        body: formData
-    });
+    showLoader(); // 👈 empieza el loader
 
-    const data = await response.json();
+    try {
+        const formData = new FormData();
+        const fileName = captureMode === "rostro" ? "rostro.png" : "documento.png";
+        formData.append("foto", capturedBlob, fileName);
 
-    if (!data.success) {
-        hideLoader();
-        alert("Error al subir la foto.");
-        return;
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert("Error al subir la foto.");
+            return;
+        }
+
+        if (captureMode === "rostro") {
+            document.getElementById("foto_url").value = data.url;
+            document.getElementById("photo-preview").style.display = "block";
+            document.getElementById("final-photo").src = data.url;
+        } else {
+            document.getElementById("foto_documento_url").value = data.url;
+            document.getElementById("photo-preview-doc").style.display = "block";
+            document.getElementById("final-photo-doc").src = data.url;
+        }
+
+        closeCamera();
+
+    } catch (err) {
+        console.error("Error aceptando foto:", err);
+        alert("Ocurrió un problema subiendo la imagen.");
+    } finally {
+        hideLoader(); // 👈 siempre se oculta
     }
-
-    // Guardar URL según tipo
-    if (captureMode === "rostro") {
-        document.getElementById("foto_url").value = data.url;
-        document.getElementById("photo-preview").style.display = "block";
-        document.getElementById("final-photo").src = data.url;
-    }
-
-    if (captureMode === "documento") {
-        document.getElementById("foto_documento_url").value = data.url;
-        document.getElementById("photo-preview-doc").style.display = "block";
-        document.getElementById("final-photo-doc").src = data.url;
-    }
-
-    closeCamera();
 }
 
 // ===============================
@@ -268,32 +275,38 @@ function closeSignature() {
 }
 
 async function saveSignature() {
-    showLoader(); // 👈 agregado
 
-    const dataURL = sigCanvas.toDataURL("image/png");
-    const blob = await (await fetch(dataURL)).blob();
+    showLoader();
 
-    const formData = new FormData();
-    formData.append("foto", blob, "firma.png");
+    try {
+        const dataURL = sigCanvas.toDataURL("image/png");
+        const blob = await (await fetch(dataURL)).blob();
 
-    const response = await fetch("/upload", {
-        method: "POST",
-        body: formData
-    });
+        const formData = new FormData();
+        formData.append("foto", blob, "firma.png");
 
-    const data = await response.json();
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
 
-    hideLoader(); // 👈 agregado
+        const data = await response.json();
 
-    if (!data.success) {
-        alert("Error al subir la firma.");
-        return;
+        if (!data.success) {
+            alert("Error al subir la firma.");
+            return;
+        }
+
+        document.getElementById("firma_url").value = data.url;
+        document.getElementById("signature-preview").style.display = "block";
+        document.getElementById("final-signature").src = data.url;
+
+        closeSignature();
+
+    } catch (err) {
+        console.error("Error guardando firma:", err);
+    } finally {
+        hideLoader();
     }
-
-    document.getElementById("firma_url").value = data.url;
-    document.getElementById("signature-preview").style.display = "block";
-    document.getElementById("final-signature").src = data.url;
-
-    closeSignature();
 }
 
