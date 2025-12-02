@@ -1,58 +1,289 @@
 /* ============================
-   ESTILOS GENERALES
+   ESTILO WHATSAPP BURBUJA
 ============================ */
-body {
-    background: #f4f4f4;
-    font-family: Arial, sans-serif;
+
+html, body {
     margin: 0;
+    padding: 0;
+    font-family: "Inter", Arial, sans-serif;
+    background: #e5ddd5;
+    -webkit-text-size-adjust: 100%;
 }
 
-.container {
-    max-width: 420px;
-    margin: auto;
-    padding: 20px;
-    background: white;
-    border-radius: 12px;
+* {
+    box-sizing: border-box;
 }
 
-/* Inputs */
-input, select {
+.form-wrapper {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    margin-bottom: 16px;
+    max-width: 600px;
+    margin: 25px auto;
+    background: #fefefe;
+    padding: 30px;
+    border-radius: 24px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    border: 1px solid #dedede;
 }
 
-/* Botón principal */
-button {
+h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #075e54;
+}
+
+label {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 18px 0 6px;
+    display: block;
+    color: #303030;
+}
+
+.input,
+select {
     width: 100%;
     padding: 16px;
-    border-radius: 12px;
-    border: none;
-    background: #25d366;
-    font-size: 18px;
-    color: white;
-    font-weight: bold;
-    transition: 0.12s;
+    border-radius: 22px;
+    border: 1.8px solid #d1d1d1;
+    background: #ffffff;
+    font-size: 16px;
+    transition: 0.20s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
 
-button:active {
-    transform: scale(0.96);
-    opacity: 0.8;
+.input:focus,
+select:focus {
+    border-color: #25d366;
+    box-shadow: 0 0 0 3px rgba(37,211,102,0.20);
+    outline: none;
+}
+
+.btn-submit {
+    margin-top: 26px;
+    width: 100%;
+    padding: 16px;
+    border-radius: 26px;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    background: #25d366;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(37,211,102,0.35);
+}
+
+.btn-camera {
+    width: 100%;
+    padding: 14px;
+    border-radius: 26px;
+    border: none;
+    font-size: 17px;
+    background: #34b7f1;
+    color: white;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 8px rgba(52,183,241,0.35);
+}
+
+.photo-preview img {
+    width: 100%;
+    border-radius: 22px;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.camera-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+}
+
+#camera {
+    width: 90%;
+    max-width: 420px;
+    display: block;
+    margin: 35px auto;
+    border-radius: 14px;
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+
+#overlay {
+    width: 90%;
+    max-width: 340px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.btn-capture,
+.btn-close {
+    width: 90%;
+    max-width: 360px;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: 700;
+    border: none;
+    border-radius: 26px;
+    display: block;
+    margin: 10px auto;
+    cursor: pointer;
+}
+
+.btn-capture {
+    background: #25d366;
+    color: #fff;
+}
+
+.btn-close {
+    background: #ff4444;
+    color: #fff;
+}
+
+.preview-area {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.94);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.preview-photo {
+    width: 90%;
+    max-width: 380px;
+    border-radius: 22px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.18);
+    margin-bottom: 20px;
+}
+
+.preview-buttons {
+    width: 90%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.btn-accept {
+    background: #25d366;
+    padding: 16px;
+    border-radius: 26px;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.btn-retake {
+    background: #34b7f1;
+    padding: 16px;
+    border-radius: 26px;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.btn-cancel {
+    background: #ff4444;
+    padding: 16px;
+    border-radius: 26px;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.admin-panel {
+    background: #fafafa;
+    border: 2px solid #e1e1e1;
+    padding: 20px;
+    border-radius: 22px;
+    margin-top: 25px;
+}
+
+.file-entry {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+}
+
+.thumb {
+    width: 80px;
+    border-radius: 12px;
+    margin-right: 12px;
+}
+
+.delete-btn {
+    background: #ff4444;
+    padding: 10px 16px;
+    border-radius: 16px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+#signature-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 9999;
+    padding: 20px;
+}
+
+#signature-canvas {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 380px;
+    height: 300px;
+    display: block;
+    margin: 40px auto 20px;
+    touch-action: none; /* necesario para dibujar en móvil */
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+
+.signature-instruction {
+    text-align: center;
+    color: #ffffff;
+    font-size: 18px;
+    margin-top: 40px;
+    margin-bottom: 10px;
+    font-weight: 600;
 }
 
 /* ============================
    LOADER GLOBAL
 ============================ */
-#loader {
+.loader-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.75);
-    display: none;
+    z-index: 99999;
+    display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 99999;
+}
+
+.loader-box {
+    text-align: center;
+    color: white;
+    font-size: 18px;
 }
 
 .spinner {
@@ -61,26 +292,54 @@ button:active {
     border: 6px solid rgba(255,255,255,0.3);
     border-top-color: #25d366;
     border-radius: 50%;
-    animation: spin .8s linear infinite;
+    margin: 0 auto 20px;
+    animation: spinner 0.8s linear infinite;
 }
 
-@keyframes spin {
+@keyframes spinner {
     to { transform: rotate(360deg); }
 }
 
-.loader-text {
-    margin-top: 10px;
-    color: white;
-    font-size: 18px;
+/* ============================
+   ANIMACIÓN DE BOTONES (PRESS)
+============================ */
+button {
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+button:active {
+    transform: scale(0.95);
+    opacity: 0.85;
+}
+
+#camera {
+    width: 100%;
+    max-height: 55vh; /* Controla el tamaño en pantalla */
+    object-fit: cover; /* Evita que se distorsione */
+    border-radius: 14px;
+}
+
+.camera-modal {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 10px;
+}
+
+#overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70%;
+    transform: translate(-50%, -50%);
+    opacity: 0.35;
+    pointer-events: none;
 }
 
 /* ============================
    MODAL WHATSAPP PRO
 ============================ */
-#camera-modal {
-    display: none !important;
-}
-
 .wa-modal {
     position: fixed;
     inset: 0;
@@ -88,35 +347,42 @@ button:active {
     display: none;
     flex-direction: column;
     z-index: 99999;
+    animation: waFadeIn .25s ease-out;
 }
 
+@keyframes waFadeIn {
+    from { opacity: 0; transform: scale(1.02); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* HEADER */
 .wa-header {
     height: 58px;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.6);
     display: flex;
     align-items: center;
     padding: 0 15px;
-    color: white;
+    color: #fff;
 }
 
 .wa-header-title {
     flex: 1;
     text-align: center;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .wa-close-btn {
-    font-size: 28px;
     background: none;
     border: none;
-    color: white;
+    color: #fff;
+    font-size: 26px;
 }
 
 /* VIDEO */
 .wa-video-container {
-    flex: 1;
     position: relative;
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -134,7 +400,7 @@ button:active {
     opacity: 0.35;
 }
 
-/* BOTÓN CAPTURA */
+/* BOTÓN DE CAPTURA */
 .wa-capture-container {
     height: 120px;
     display: flex;
@@ -145,20 +411,22 @@ button:active {
 .wa-capture-btn {
     width: 85px;
     height: 85px;
-    background: white;
+    background: #fff;
     border-radius: 50%;
     border: 6px solid #25d366;
 }
 
 /* PREVIEW */
-#preview-area {
+.wa-preview {
     display: none;
+    flex: 1;
     flex-direction: column;
     background: #000;
 }
 
 .wa-preview-img {
     width: 100%;
+    height: auto;
     object-fit: contain;
     flex: 1;
 }
@@ -170,28 +438,16 @@ button:active {
     gap: 12px;
 }
 
+.wa-use-btn,
+.wa-retake-btn,
+.wa-close2-btn {
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 18px;
+    color: #fff;
+}
+
 .wa-use-btn { background: #25d366; }
 .wa-retake-btn { background: #ffcd03; }
 .wa-close2-btn { background: #ff3b30; }
-
-/* ============================
-   FIRMA DIGITAL
-============================ */
-#signature-modal {
-    display: none !important;
-}
-
-.signature-instruction {
-    color: white;
-    text-align: center;
-    margin: 20px 0;
-    font-size: 18px;
-}
-
-#signature-canvas {
-    width: 100%;
-    height: 280px;
-    background: white;
-    border-radius: 12px;
-    touch-action: none;
-}

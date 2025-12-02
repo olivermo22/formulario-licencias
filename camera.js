@@ -11,17 +11,19 @@ let captureMode = "rostro"; // "rostro" o "documento"
 function showLoader() {
     document.getElementById("loader").style.display = "flex";
 }
+
 function hideLoader() {
     document.getElementById("loader").style.display = "none";
 }
 
 /* ============================================================
-   OCULTAR PREVIEW Y MOSTRAR VIDEO
+   RESET DE LA UI DE LA CÁMARA
 ============================================================ */
 function resetCameraUI() {
     document.getElementById("preview-area").style.display = "none";
-    document.getElementById("wa-capture-buttons").style.display = "flex";
     document.getElementById("camera").style.display = "block";
+    document.getElementById("btn-capture").style.display = "block";
+    document.getElementById("btn-close").style.display = "block";
 
     if (captureMode === "rostro") {
         document.getElementById("overlay").src = "silhouette.png";
@@ -32,26 +34,6 @@ function resetCameraUI() {
 }
 
 /* ============================================================
-   DETECTAR MEJOR CÁMARA TRASERA
-============================================================ */
-async function getBestBackCamera() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(d => d.kind === "videoinput");
-
-    const backCams = videoDevices.filter(d =>
-        d.label.toLowerCase().includes("back") ||
-        d.label.toLowerCase().includes("rear") ||
-        d.label.toLowerCase().includes("environment")
-    );
-
-    if (backCams.length > 0) {
-        return backCams[backCams.length - 1].deviceId;
-    }
-
-    return videoDevices[videoDevices.length - 1].deviceId;
-}
-
-/* ============================================================
    ABRIR CÁMARA PARA ROSTRO
 ============================================================ */
 function openCamera() {
@@ -59,7 +41,7 @@ function openCamera() {
     capturedBlob = null;
     resetCameraUI();
 
-    document.getElementById("camera-modal").style.display = "flex";
+    document.getElementById("camera-modal").style.display = "block";
 
     navigator.mediaDevices.getUserMedia({
         video: {
@@ -73,39 +55,38 @@ function openCamera() {
         document.getElementById("camera").srcObject = s;
     })
     .catch(err => {
-        alert("No se pudo abrir la cámara.");
         console.error(err);
+        alert("No se pudo acceder a la cámara.");
     });
 }
 
 /* ============================================================
    ABRIR CÁMARA PARA DOCUMENTO
 ============================================================ */
-async function openCameraDoc() {
+ async function openCameraDoc() {
     captureMode = "documento";
     capturedBlob = null;
     resetCameraUI();
     document.getElementById("overlay").style.display = "none";
-
-    document.getElementById("camera-modal").style.display = "flex";
+    document.getElementById("camera-modal").style.display = "block";
 
     try {
-        const deviceId = await getBestBackCamera();
+        const bestCameraId = await getBestBackCamera();
 
-        const s = await navigator.mediaDevices.getUserMedia({
+        const streamResult = await navigator.mediaDevices.getUserMedia({
             video: {
-                deviceId: { exact: deviceId },
+                deviceId: { exact: bestCameraId },
                 width: { ideal: 1920 },
                 height: { ideal: 1080 }
             }
         });
 
-        stream = s;
-        document.getElementById("camera").srcObject = s;
+        stream = streamResult;
+        document.getElementById("camera").srcObject = streamResult;
 
     } catch (err) {
-        alert("No se pudo usar la cámara trasera correctamente.");
         console.error(err);
+        alert("No se pudo usar la cámara trasera correcta. Se usará la frontal.");
         openCamera();
     }
 }
@@ -126,71 +107,85 @@ function capture() {
     canvas.toBlob(blob => {
         capturedBlob = blob;
 
-        document.getElementById("preview-photo").src =
-            URL.createObjectURL(blob);
-
-        document.getElementById("wa-capture-buttons").style.display = "none";
-        document.getElementById("camera").style.display = "none";
-        document.getElementById("overlay").style.display = "none";
+        document.getElementById("preview-photo").src = URL.createObjectURL(blob);
         document.getElementById("preview-area").style.display = "flex";
+        document.getElementById("camera").style.display = "none";
+        document.getElementById("wa-capture-buttons").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+
+        
+        document.getElementById("btn-capture").style.display = "none";
+        document.getElementById("btn-close").style.display = "none";
+
+        
 
     }, "image/jpeg", 0.92);
 }
 
 /* ============================================================
-   ACEPTAR FOTO (SUBIR)
+   ACEPTAR FOTO → SUBIR AL SERVIDOR
 ============================================================ */
 async function acceptPhoto() {
 
     if (!capturedBlob) {
-        alert("No hay foto.");
+        alert("No hay foto capturada.");
         return;
     }
 
     showLoader();
 
     try {
-        const fd = new FormData();
-        const name = captureMode === "rostro" ? "rostro.jpg" : "documento.jpg";
-        fd.append("foto", capturedBlob, name);
+        const formData = new FormData();
+        const fileName = captureMode === "rostro" ? "rostro.jpg" : "documento.jpg";
+        formData.append("foto", capturedBlob, fileName);
 
-        const res = await fetch("/upload", { method: "POST", body: fd });
-        const data = await res.json();
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
 
         if (!data.success) {
-            alert("Error subiendo imagen");
+            alert("Error al subir la foto.");
             return;
         }
 
         if (captureMode === "rostro") {
             document.getElementById("foto_url").value = data.url;
-            document.getElementById("final-photo").src = data.url;
             document.getElementById("photo-preview").style.display = "block";
-        } else {
+            document.getElementById("final-photo").src = data.url;
+        }
+
+        if (captureMode === "documento") {
             document.getElementById("foto_documento_url").value = data.url;
-            document.getElementById("final-photo-doc").src = data.url;
             document.getElementById("photo-preview-doc").style.display = "block";
+            document.getElementById("final-photo-doc").src = data.url;
         }
 
         closeCamera();
 
     } catch (err) {
-        console.error(err);
+        console.error("Error subiendo imagen:", err);
     } finally {
         hideLoader();
     }
 }
 
 /* ============================================================
-   RE-TOMAR FOTO
+   REHACER FOTO
 ============================================================ */
 function retakePhoto() {
+    document.getElementById("preview-area").style.display = "none";
+    document.getElementById("wa-capture-buttons").style.display = "flex";
+document.getElementById("camera").style.display = "block";
+
     capturedBlob = null;
     resetCameraUI();
 }
 
 /* ============================================================
-   CANCELAR CAPTURA
+   CANCELAR FOTO
 ============================================================ */
 function cancelPhoto() {
     capturedBlob = null;
@@ -203,10 +198,11 @@ function cancelPhoto() {
 function closeCamera() {
     if (stream) {
         stream.getTracks().forEach(t => t.stop());
+        stream = null;
     }
 
-    document.getElementById("camera-modal").style.display = "none";
     resetCameraUI();
+    document.getElementById("camera-modal").style.display = "none";
 }
 
 /* ============================================================
@@ -218,7 +214,8 @@ let lastX = 0;
 let lastY = 0;
 
 function openSignature() {
-    document.getElementById("signature-modal").style.display = "flex";
+    document.getElementById("signature-modal").style.display = "block";
+    document.getElementById("signature-instruction").style.display = "block";
 
     sigCanvas = document.getElementById("signature-canvas");
     sigCtx = sigCanvas.getContext("2d");
@@ -232,7 +229,7 @@ function openSignature() {
     sigCanvas.addEventListener("touchstart", startDraw, false);
     sigCanvas.addEventListener("touchmove", drawTouch, false);
     sigCanvas.addEventListener("touchend", stopDraw, false);
-
+    
     sigCanvas.addEventListener("mousedown", startDraw, false);
     sigCanvas.addEventListener("mousemove", drawMouse, false);
     sigCanvas.addEventListener("mouseup", stopDraw, false);
@@ -259,7 +256,7 @@ function drawTouch(e) {
 }
 
 function drawLine(x, y) {
-    sigCtx.strokeStyle = "#000";
+    sigCtx.strokeStyle = "#000000";
     sigCtx.lineWidth = 3;
     sigCtx.lineCap = "round";
 
@@ -277,7 +274,7 @@ function stopDraw() {
 }
 
 function getPos(e) {
-    const rect = sigCanvas.getBoundingClientRect();
+    let rect = sigCanvas.getBoundingClientRect();
     if (e.touches) {
         return {
             x: e.touches[0].clientX - rect.left,
@@ -294,29 +291,35 @@ function clearSignature() {
 
 function closeSignature() {
     document.getElementById("signature-modal").style.display = "none";
+    document.getElementById("signature-instruction").style.display = "none";
 }
 
 async function saveSignature() {
+
     showLoader();
 
     try {
         const dataURL = sigCanvas.toDataURL("image/png");
         const blob = await (await fetch(dataURL)).blob();
 
-        const fd = new FormData();
-        fd.append("foto", blob, "firma.png");
+        const formData = new FormData();
+        formData.append("foto", blob, "firma.png");
 
-        const res = await fetch("/upload", { method: "POST", body: fd });
-        const data = await res.json();
+        const response = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
 
         if (!data.success) {
-            alert("Error subiendo firma");
+            alert("Error al subir la firma.");
             return;
         }
 
         document.getElementById("firma_url").value = data.url;
-        document.getElementById("final-signature").src = data.url;
         document.getElementById("signature-preview").style.display = "block";
+        document.getElementById("final-signature").src = data.url;
 
         closeSignature();
 
@@ -325,4 +328,25 @@ async function saveSignature() {
     } finally {
         hideLoader();
     }
+}
+
+async function getBestBackCamera() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+
+    const videoDevices = devices.filter(d => d.kind === "videoinput");
+
+    // Intentamos encontrar la cámara trasera por nombre
+    let backCameras = videoDevices.filter(d =>
+        d.label.toLowerCase().includes("back") ||
+        d.label.toLowerCase().includes("rear") ||
+        d.label.toLowerCase().includes("environment")
+    );
+
+    // Si encontramos varias, elegir la más probable de alta calidad
+    if (backCameras.length > 0) {
+        return backCameras[backCameras.length - 1].deviceId;
+    }
+
+    // Si no detecta, usar la última (suele ser la trasera)
+    return videoDevices[videoDevices.length - 1].deviceId;
 }
