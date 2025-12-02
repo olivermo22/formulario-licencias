@@ -4,35 +4,29 @@
 let stream;
 let capturedBlob = null;
 let captureMode = "rostro"; // "rostro" o "documento"
-// =======================================================
-// OBTENER LA MEJOR CÁMARA DISPONIBLE (MAYOR RESOLUCIÓN)
-// =======================================================
-async function getRearCamera() {
+
+async function getBestBackCamera() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
-        const cams = devices.filter(d => d.kind === "videoinput");
+        const videoDevices = devices.filter(d => d.kind === "videoinput");
 
-        // Intentar encontrar cámaras que no sean frontales
-        let rearCams = cams.filter(c =>
-            !c.label.toLowerCase().includes("front") &&
-            !c.label.toLowerCase().includes("user")
+        // Filtramos cámaras traseras
+        const backCameras = videoDevices.filter(d =>
+            d.label.toLowerCase().includes("back") ||
+            d.label.toLowerCase().includes("rear") ||
+            d.label.toLowerCase().includes("environment")
         );
 
-        // Si no encontramos por label, elegir la cámara #1 (trasera típica)
-        if (rearCams.length === 0 && cams.length > 1) {
-            return cams[1].deviceId;
-        }
+        // Si no detecta etiqueta (Android restringe labels), tomamos la última cámara (generalmente la principal)
+        if (backCameras.length === 0) return videoDevices[videoDevices.length - 1].deviceId;
 
-        // Si hay múltiples traseras, priorizar la de mejor etiqueta
-        if (rearCams.length >= 1) {
-            return rearCams[0].deviceId;
-        }
+        // Regresamos la cámara trasera con nombre más largo (normalmente la de mejor calidad)
+        backCameras.sort((a, b) => b.label.length - a.label.length);
 
-        // Fallback
-        return cams[0].deviceId;
+        return backCameras[0].deviceId;
 
     } catch (err) {
-        console.log("Error buscando cámara trasera:", err);
+        console.error("Error detectando cámaras:", err);
         return null;
     }
 }
@@ -88,7 +82,7 @@ function openCamera() {
 }
 
 // =======================================================
-// ABRIR CÁMARA DOCUMENTO CON LA MEJOR RESOLUCIÓN
+// ABRIR CÁMARA - FOTO DEL DOCUMENTO
 // =======================================================
 async function openCameraDoc() {
     captureMode = "documento";
@@ -99,37 +93,22 @@ async function openCameraDoc() {
     document.getElementById("camera-modal").style.display = "block";
 
     try {
-        // PRIMERA LLAMADA: pedir permisos para obtener labels reales
-        await navigator.mediaDevices.getUserMedia({ video: true });
+        const bestCameraId = await getBestBackCamera();
 
-        // OBTENER ID DE CÁMARA TRASERA REAL 
-        const rearId = await getRearCamera();
-
-        const constraints = rearId
-            ? {
-                video: {
-                    deviceId: { exact: rearId },
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                }
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                deviceId: bestCameraId ? { exact: bestCameraId } : undefined,
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                facingMode: { exact: "environment" }
             }
-            : {
-                video: {
-                    facingMode: { ideal: "environment" },
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 }
-                }
-            };
+        });
 
-        const s = await navigator.mediaDevices.getUserMedia(constraints);
-        stream = s;
-        document.getElementById("camera").srcObject = s;
-
-        setTimeout(adjustOverlayPosition, 400);
+        document.getElementById("camera").srcObject = stream;
 
     } catch (err) {
-        console.log("Error usando cámara trasera:", err);
-        alert("No se pudo acceder a la cámara trasera, usando la frontal.");
+        console.error(err);
+        alert("No se pudo usar la cámara trasera. Usando cámara frontal.");
         openCamera();
     }
 }

@@ -153,15 +153,14 @@ button:active {
 /* SILUETA CENTRADA */
 #overlay {
     position: absolute;
-    top: 120px; /* se ajusta después con JS */
+    top: 120px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90%;         /* ← La clave: 90% del ancho del video */
-    max-width: 380px;   /* límite para pantallas grandes */
+    width: 90%;
+    max-width: 380px;
     opacity: 0.55;
     pointer-events: none;
 }
-
 
 /* BOTONES CAPTURA DEBAJO DEL VIDEO */
 .capture-group {
